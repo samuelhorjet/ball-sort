@@ -1,0 +1,73 @@
+/* ─── BallSort Design Tokens ─────────────────────────────────────────────── */
+/* Unity UI Toolkit USS Variables                                              */
+
+:root {
+    /* Primary palette */
+    --pink-primary:     rgb(255, 45, 120);
+    --pink-light:       rgb(255, 110, 180);
+    --pink-dark:        rgb(200, 0, 80);
+    --pink-glow-5:      rgba(255, 45, 120, 0.05);
+    --pink-glow-10:     rgba(255, 45, 120, 0.10);
+    --pink-glow-20:     rgba(255, 45, 120, 0.20);
+    --pink-glow-30:     rgba(255, 45, 120, 0.30);
+
+    /* Background layers */
+    --bg-base:          rgb(5, 5, 8);
+    --bg-card:          rgba(255, 255, 255, 0.04);
+    --bg-card-hover:    rgba(255, 255, 255, 0.07);
+    --bg-pink-card:     rgba(255, 45, 120, 0.06);
+
+    /* Borders */
+    --border-subtle:    rgba(255, 255, 255, 0.08);
+    --border-pink:      rgba(255, 45, 120, 0.25);
+    --border-pink-strong: rgba(255, 45, 120, 0.50);
+
+    /* Text */
+    --text-primary:     rgb(241, 241, 241);
+    --text-secondary:   rgba(241, 241, 241, 0.50);
+    --text-muted:       rgba(241, 241, 241, 0.25);
+    --text-pink:        rgb(255, 110, 180);
+
+    /* Status colors */
+    --green:            rgb(34, 197, 94);
+    --yellow:           rgb(234, 179, 8);
+    --red:              rgb(239, 68, 68);
+
+    /* Ball colors (matching TypeScript BALL_COLORS) */
+    --ball-1:  rgb(255, 45, 120);   /* Pink    */
+    --ball-2:  rgb(0, 212, 255);    /* Cyan    */
+    --ball-3:  rgb(255, 215, 0);    /* Gold    */
+    --ball-4:  rgb(124, 58, 237);   /* Violet  */
+    --ball-5:  rgb(16, 185, 129);   /* Emerald */
+    --ball-6:  rgb(249, 115, 22);   /* Orange  */
+    --ball-7:  rgb(59, 130, 246);   /* Blue    */
+    --ball-8:  rgb(236, 72, 153);   /* Rose    */
+    --ball-9:  rgb(132, 204, 22);   /* Lime    */
+    --ball-10: rgb(20, 184, 166);   /* Teal    */
+
+    /* Spacing scale */
+    --space-xs:  4px;
+    --space-sm:  8px;
+    --space-md:  16px;
+    --space-lg:  24px;
+    --space-xl:  32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+
+    /* Border radius */
+    --radius-sm:  8px;
+    --radius-md:  12px;
+    --radius-lg:  20px;
+    --radius-xl:  28px;
+    --radius-full: 999px;
+
+    /* Font sizes */
+    --font-xs:   11px;
+    --font-sm:   13px;
+    --font-md:   15px;
+    --font-lg:   18px;
+    --font-xl:   24px;
+    --font-2xl:  32px;
+    --font-3xl:  42px;
+    --font-4xl:  56px;
+}

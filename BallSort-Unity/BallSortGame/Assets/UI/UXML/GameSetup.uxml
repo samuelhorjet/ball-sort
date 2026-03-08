@@ -1,0 +1,110 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/Variables.uss" />
+    <Style src="../USS/Common.uss" />
+    <Style src="../USS/Game.uss" />
+
+    <ui:VisualElement name="GameSetupScreen" class="screen col">
+
+        <!-- Header -->
+        <ui:VisualElement class="row" style="padding: 16px 20px; gap: 12px; align-items: center;">
+            <ui:Button name="BackBtn" class="btn-ghost" style="padding: 8px;">
+                <ui:Label text="← Back" style="font-size: 13px; color: rgba(241, 241, 241, 0.25);"/>
+            </ui:Button>
+        </ui:VisualElement>
+
+        <ui:ScrollView class="screen-content" style="gap: 0;">
+
+            <ui:Label text="Setup Puzzle" class="heading-md" style="margin-bottom: 4px;"/>
+            <ui:Label text="Choose your tube and ball count. Session key opens automatically."
+                class="body-small" style="margin-bottom: 32px; white-space: normal;"/>
+
+            <!-- Tube count -->
+            <ui:VisualElement class="glass-card fill-width" style="margin-bottom: 16px;">
+                <ui:Label text="NUMBER OF TUBES" class="label-mono" style="margin-bottom: 16px;"/>
+
+                <ui:VisualElement class="setup-slider-row">
+                    <ui:Button name="TubesMinus" class="btn-secondary" style="width: 44px; height: 44px; padding: 0;">
+                        <ui:Label text="−" style="font-size: 22px; color: rgb(241, 241, 241); -unity-text-align: middle-center;"/>
+                    </ui:Button>
+
+                    <ui:VisualElement class="col center" style="flex-grow: 1;">
+                        <ui:Label name="TubesValue" text="6" class="setup-slider-value"/>
+                        <ui:Label name="TubesSubLabel" text="5 full + 1 empty" class="body-small"/>
+                    </ui:VisualElement>
+
+                    <ui:Button name="TubesPlus" class="btn-secondary" style="width: 44px; height: 44px; padding: 0;">
+                        <ui:Label text="+" style="font-size: 22px; color: rgb(241, 241, 241); -unity-text-align: middle-center;"/>
+                    </ui:Button>
+                </ui:VisualElement>
+
+                <ui:VisualElement class="progress-track" style="margin-top: 8px;">
+                    <ui:VisualElement name="TubesProgressFill" class="progress-fill" style="width: 33%;"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="row-between" style="margin-top: 6px;">
+                    <ui:Label text="MIN: 4" class="label-mono"/>
+                    <ui:Label text="MAX: 10" class="label-mono"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Ball count -->
+            <ui:VisualElement class="glass-card fill-width" style="margin-bottom: 16px;">
+                <ui:Label text="BALLS PER TUBE" class="label-mono" style="margin-bottom: 16px;"/>
+
+                <ui:VisualElement class="setup-slider-row">
+                    <ui:Button name="BallsMinus" class="btn-secondary" style="width: 44px; height: 44px; padding: 0;">
+                        <ui:Label text="−" style="font-size: 22px; color: rgb(241, 241, 241); -unity-text-align: middle-center;"/>
+                    </ui:Button>
+
+                    <ui:VisualElement class="col center" style="flex-grow: 1;">
+                        <ui:Label name="BallsValue" text="4" class="setup-slider-value"/>
+                        <ui:Label name="BallsSubLabel" text="4 balls stacked" class="body-small"/>
+                    </ui:VisualElement>
+
+                    <ui:Button name="BallsPlus" class="btn-secondary" style="width: 44px; height: 44px; padding: 0;">
+                        <ui:Label text="+" style="font-size: 22px; color: rgb(241, 241, 241); -unity-text-align: middle-center;"/>
+                    </ui:Button>
+                </ui:VisualElement>
+
+                <ui:VisualElement class="progress-track" style="margin-top: 8px;">
+                    <ui:VisualElement name="BallsProgressFill" class="progress-fill" style="width: 0%;"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="row-between" style="margin-top: 6px;">
+                    <ui:Label text="MIN: 4" class="label-mono"/>
+                    <ui:Label text="MAX: 10" class="label-mono"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Board preview (populated by C#) -->
+            <ui:Label text="PREVIEW" class="label-mono" style="margin-bottom: 12px;"/>
+            <ui:VisualElement name="BoardPreview" class="setup-preview fill-width" style="margin-bottom: 32px;
+                min-height: 120px;
+            "/>
+
+            <!-- Info card -->
+            <ui:VisualElement class="glass-card fill-width" style="margin-bottom: 24px; padding: 14px 16px;">
+                <ui:VisualElement class="row" style="gap: 10px; align-items: flex-start;">
+                    <ui:Label text="ℹ" style="font-size: 14px; color: rgb(255, 110, 180); margin-top: 1px;"/>
+                    <ui:Label
+                        text="Ball placement is randomized by on-chain VRF. The more tubes and balls you choose, the harder the puzzle becomes."
+                        class="body-small" style="flex-grow: 1; white-space: normal;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Start button -->
+            <ui:Button name="StartBtn" class="btn-primary fill-width">
+                <ui:Label text="Start Puzzle" style="
+                    font-size: 18px; -unity-font-style: bold;
+                    color: white; -unity-text-align: middle-center;
+                "/>
+            </ui:Button>
+
+            <ui:Label name="SessionHint" text="Opening session key... no wallet popups during play"
+                class="body-small" style="
+                    -unity-text-align: middle-center;
+                    margin-top: 12px;
+                    display: none;
+                "/>
+
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

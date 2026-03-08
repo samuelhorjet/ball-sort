@@ -1,0 +1,85 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/Variables.uss" />
+    <Style src="../USS/Common.uss" />
+    <Style src="../USS/Game.uss" />
+
+    <ui:VisualElement name="TutorialScreen" class="screen col" style="background-color: rgb(5, 5, 8);">
+
+        <!-- Glow orb -->
+        <ui:VisualElement style="
+            position: absolute; width: 350px; height: 350px;
+            border-radius: 999px; background-color: rgba(255,45,120,0.06);
+            left: 50%; top: 30%; translate: -50% -50%;
+        "/>
+
+        <!-- Header -->
+        <ui:VisualElement class="row-between" style="
+            padding: 16px 20px;
+            border-bottom-width: 1px;
+            border-color: rgba(255, 255, 255, 0.08);
+        ">
+            <ui:VisualElement class="row" style="gap: 10px;">
+                <ui:VisualElement style="
+                    width: 26px; height: 26px; border-radius: 999px;
+                    background-color: rgb(255, 45, 120);
+                "/>
+                <ui:Label text="BALLSORT" style="
+                    font-size: 14px; -unity-font-style: bold;
+                    color: rgb(241, 241, 241); letter-spacing: 4px;
+                "/>
+            </ui:VisualElement>
+            <ui:VisualElement class="badge">
+                <ui:Label text="TUTORIAL" style="font-size: 11px; color: rgb(255, 110, 180); letter-spacing: 2px;"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Instruction card -->
+        <ui:VisualElement style="padding: 16px 20px 0 20px;">
+            <ui:VisualElement class="glass-card fill-width" style="padding: 14px 16px;">
+                <ui:VisualElement class="row" style="gap: 10px; align-items: flex-start;">
+                    <ui:Label text="💡" style="font-size: 16px;"/>
+                    <ui:Label name="HintLabel"
+                        text="Tap a tube to select it, then tap another to move the top ball. Sort all balls by colour to win!"
+                        class="body-small" style="flex-grow: 1; white-space: normal;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- HUD row -->
+        <ui:VisualElement class="row" style="
+            padding: 12px 20px; gap: 20px; justify-content: center;
+        ">
+            <ui:VisualElement class="hud-stat">
+                <ui:Label name="MovesLabel" text="0" class="hud-value"/>
+                <ui:Label text="MOVES" class="hud-label"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Board row (populated by TutorialBoardRenderer) -->
+        <ui:VisualElement name="BoardRow" style="
+            flex-direction: row;
+            align-items: flex-end;
+            justify-content: center;
+            flex-wrap: wrap;
+            flex-grow: 1;
+            padding: 0 16px;
+        "/>
+
+        <!-- Bottom controls -->
+        <ui:VisualElement class="game-controls">
+            <ui:Button name="UndoBtn" class="btn-secondary" style="flex-grow: 1;">
+                <ui:Label text="↩  Undo" style="
+                    font-size: 15px; color: rgba(241, 241, 241, 0.50);
+                    -unity-text-align: middle-center;
+                "/>
+            </ui:Button>
+            <ui:Button name="SkipBtn" class="btn-ghost" style="padding: 14px 20px;">
+                <ui:Label text="Skip Tutorial →" style="
+                    font-size: 13px; color: rgba(241, 241, 241, 0.25);
+                    -unity-text-align: middle-center;
+                "/>
+            </ui:Button>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

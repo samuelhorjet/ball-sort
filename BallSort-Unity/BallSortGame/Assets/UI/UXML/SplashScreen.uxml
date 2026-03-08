@@ -1,0 +1,61 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <Style src="../USS/Variables.uss" />
+    <Style src="../USS/Common.uss" />
+
+    <ui:VisualElement name="SplashScreen" class="screen center" style="background-color: rgb(5, 5, 8);">
+
+        <!-- Background grid overlay (tinted via C#) -->
+        <ui:VisualElement name="GridOverlay" style="
+            position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+            opacity: 0.15;
+        "/>
+
+        <!-- Glow orb -->
+        <ui:VisualElement name="GlowOrb" style="
+            position: absolute;
+            width: 400px; height: 400px;
+            border-radius: 999px;
+            background-color: rgba(255,45,120,0.07);
+            left: 50%; top: 35%;
+            translate: -50% -50%;
+        "/>
+
+        <!-- Center content -->
+        <ui:VisualElement name="LogoGroup" class="col center" style="margin-bottom: 60px;">
+
+            <!-- Animated ball cluster (populated by C#) -->
+            <ui:VisualElement name="BallCluster" class="row" style="
+                align-items: flex-end;
+                gap: 8px;
+                margin-bottom: 28px;
+            "/>
+
+            <!-- Title -->
+            <ui:Label name="TitleLabel" text="BALLSORT"
+                class="heading-xl"
+                style="
+                    color: rgb(255, 45, 120);
+                    letter-spacing: 6px;
+                    font-size: 42px;
+                    -unity-font-style: bold;
+                "/>
+
+            <!-- Subtitle -->
+            <ui:Label name="SubtitleLabel" text="ON-CHAIN PUZZLE GAME"
+                class="label-mono"
+                style="margin-top: 6px; letter-spacing: 4px;"/>
+        </ui:VisualElement>
+
+        <!-- Progress section -->
+        <ui:VisualElement name="ProgressGroup" style="width: 280px;">
+            <ui:VisualElement class="row-between" style="margin-bottom: 8px;">
+                <ui:Label name="ProgressLabel" text="Initializing..." class="body-small"/>
+                <ui:Label name="ProgressPercent" text="0%" class="label-pink"/>
+            </ui:VisualElement>
+            <ui:VisualElement class="progress-track">
+                <ui:VisualElement name="ProgressFill" class="progress-fill" style="width: 0%;"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,180 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/Variables.uss" />
+    <Style src="../USS/Common.uss" />
+
+    <ui:VisualElement name="LeaderboardScreen" class="screen col" style="background-color: rgb(5, 5, 8);">
+
+        <!-- Header -->
+        <ui:VisualElement class="row-between" style="
+            padding: 16px 20px;
+            border-bottom-width: 1px;
+            border-color: rgba(255, 255, 255, 0.08);
+        ">
+            <ui:Button name="BackBtn" class="btn-ghost" style="padding: 8px 0;">
+                <ui:Label text="← Back" style="font-size: 13px; color: rgba(241, 241, 241, 0.25);"/>
+            </ui:Button>
+            <ui:Label text="LEADERBOARD" style="
+                font-size: 13px; -unity-font-style: bold;
+                color: rgb(241, 241, 241); letter-spacing: 3px;
+            "/>
+            <ui:VisualElement style="width: 60px;"/>
+        </ui:VisualElement>
+
+        <!-- Difficulty filter tabs -->
+        <ui:VisualElement class="row" style="
+            padding: 12px 20px; gap: 8px;
+            border-bottom-width: 1px; border-color: rgba(255, 255, 255, 0.08);
+        ">
+            <ui:Button name="TabAll" class="btn-secondary" style="flex-grow: 1; padding: 8px 0;">
+                <ui:Label text="ALL" style="font-size: 12px; letter-spacing: 2px; -unity-text-align: middle-center;"/>
+            </ui:Button>
+            <ui:Button name="TabEasy" class="btn-secondary" style="flex-grow: 1; padding: 8px 0;">
+                <ui:Label text="EASY" style="font-size: 12px; letter-spacing: 2px; -unity-text-align: middle-center;"/>
+            </ui:Button>
+            <ui:Button name="TabMedium" class="btn-secondary" style="flex-grow: 1; padding: 8px 0;">
+                <ui:Label text="MED" style="font-size: 12px; letter-spacing: 2px; -unity-text-align: middle-center;"/>
+            </ui:Button>
+            <ui:Button name="TabHard" class="btn-secondary" style="flex-grow: 1; padding: 8px 0;">
+                <ui:Label text="HARD" style="font-size: 12px; letter-spacing: 2px; -unity-text-align: middle-center;"/>
+            </ui:Button>
+        </ui:VisualElement>
+
+        <!-- Top 3 podium -->
+        <ui:VisualElement class="row" style="
+            padding: 24px 20px 16px 20px;
+            justify-content: center;
+            gap: 12px;
+            align-items: flex-end;
+        ">
+            <!-- 2nd -->
+            <ui:VisualElement class="col center" style="flex-grow: 1;">
+                <ui:Label text="🥈" style="font-size: 28px; -unity-text-align: middle-center;"/>
+                <ui:VisualElement class="glass-card col center" style="
+                    padding: 12px 8px; width: 100%; margin-top: 6px;
+                    border-radius: 16px 16px 0 0; min-height: 70px;
+                ">
+                    <ui:Label name="Rank2Address" text="3kZx...8mRp" style="
+                        font-size: 11px; color: rgba(241, 241, 241, 0.50);
+                        -unity-text-align: middle-center;
+                    "/>
+                    <ui:Label name="Rank2Score" text="—" style="
+                        font-size: 18px; -unity-font-style: bold;
+                        color: rgb(241, 241, 241); -unity-text-align: middle-center;
+                    "/>
+                    <ui:Label text="PTS" class="label-mono" style="-unity-text-align: middle-center;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- 1st -->
+            <ui:VisualElement class="col center" style="flex-grow: 1;">
+                <ui:Label text="🥇" style="font-size: 36px; -unity-text-align: middle-center;"/>
+                <ui:VisualElement class="glass-card-pink col center" style="
+                    padding: 14px 8px; width: 100%; margin-top: 6px;
+                    border-radius: 16px 16px 0 0; min-height: 90px;
+                ">
+                    <ui:Label name="Rank1Address" text="5Ax3...9kRz" style="
+                        font-size: 11px; color: rgb(255, 110, 180);
+                        -unity-text-align: middle-center;
+                    "/>
+                    <ui:Label name="Rank1Score" text="—" style="
+                        font-size: 24px; -unity-font-style: bold;
+                        color: rgb(255, 45, 120); -unity-text-align: middle-center;
+                    "/>
+                    <ui:Label text="PTS" class="label-pink" style="-unity-text-align: middle-center;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- 3rd -->
+            <ui:VisualElement class="col center" style="flex-grow: 1;">
+                <ui:Label text="🥉" style="font-size: 28px; -unity-text-align: middle-center;"/>
+                <ui:VisualElement class="glass-card col center" style="
+                    padding: 12px 8px; width: 100%; margin-top: 6px;
+                    border-radius: 16px 16px 0 0; min-height: 60px;
+                ">
+                    <ui:Label name="Rank3Address" text="9wQb...2nXv" style="
+                        font-size: 11px; color: rgba(241, 241, 241, 0.50);
+                        -unity-text-align: middle-center;
+                    "/>
+                    <ui:Label name="Rank3Score" text="—" style="
+                        font-size: 18px; -unity-font-style: bold;
+                        color: rgb(241, 241, 241); -unity-text-align: middle-center;
+                    "/>
+                    <ui:Label text="PTS" class="label-mono" style="-unity-text-align: middle-center;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Rank list -->
+        <ui:ScrollView name="RankScroll" style="flex-grow: 1; padding: 0 20px 20px 20px;">
+
+            <!-- Column headers -->
+            <ui:VisualElement class="row-between" style="padding: 8px 16px; margin-bottom: 4px;">
+                <ui:Label text="RANK" class="label-mono" style="width: 40px;"/>
+                <ui:Label text="PLAYER" class="label-mono" style="flex-grow: 1;"/>
+                <ui:Label text="SCORE" class="label-mono" style="width: 70px; -unity-text-align: middle-right;"/>
+                <ui:Label text="PUZZLES" class="label-mono" style="width: 60px; -unity-text-align: middle-right;"/>
+            </ui:VisualElement>
+
+            <!-- Rows 4–10 (static shells — populated by C# later) -->
+            <ui:VisualElement name="Row4" class="glass-card fill-width" style="padding: 12px 16px; margin-bottom: 6px; border-radius: 12px;">
+                <ui:VisualElement class="row-between">
+                    <ui:Label text="4" style="font-size: 13px; color: rgba(241, 241, 241, 0.25); width: 40px;"/>
+                    <ui:Label name="Row4Address" text="—" style="font-size: 13px; color: rgba(241, 241, 241, 0.50); flex-grow: 1;"/>
+                    <ui:Label name="Row4Score" text="—" style="font-size: 14px; -unity-font-style: bold; color: rgb(241, 241, 241); width: 70px; -unity-text-align: middle-right;"/>
+                    <ui:Label name="Row4Count" text="—" style="font-size: 12px; color: rgba(241, 241, 241, 0.25); width: 60px; -unity-text-align: middle-right;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="Row5" class="glass-card fill-width" style="padding: 12px 16px; margin-bottom: 6px; border-radius: 12px;">
+                <ui:VisualElement class="row-between">
+                    <ui:Label text="5" style="font-size: 13px; color: rgba(241, 241, 241, 0.25); width: 40px;"/>
+                    <ui:Label name="Row5Address" text="—" style="font-size: 13px; color: rgba(241, 241, 241, 0.50); flex-grow: 1;"/>
+                    <ui:Label name="Row5Score" text="—" style="font-size: 14px; -unity-font-style: bold; color: rgb(241, 241, 241); width: 70px; -unity-text-align: middle-right;"/>
+                    <ui:Label name="Row5Count" text="—" style="font-size: 12px; color: rgba(241, 241, 241, 0.25); width: 60px; -unity-text-align: middle-right;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="Row6" class="glass-card fill-width" style="padding: 12px 16px; margin-bottom: 6px; border-radius: 12px;">
+                <ui:VisualElement class="row-between">
+                    <ui:Label text="6" style="font-size: 13px; color: rgba(241, 241, 241, 0.25); width: 40px;"/>
+                    <ui:Label name="Row6Address" text="—" style="font-size: 13px; color: rgba(241, 241, 241, 0.50); flex-grow: 1;"/>
+                    <ui:Label name="Row6Score" text="—" style="font-size: 14px; -unity-font-style: bold; color: rgb(241, 241, 241); width: 70px; -unity-text-align: middle-right;"/>
+                    <ui:Label name="Row6Count" text="—" style="font-size: 12px; color: rgba(241, 241, 241, 0.25); width: 60px; -unity-text-align: middle-right;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="Row7" class="glass-card fill-width" style="padding: 12px 16px; margin-bottom: 6px; border-radius: 12px;">
+                <ui:VisualElement class="row-between">
+                    <ui:Label text="7" style="font-size: 13px; color: rgba(241, 241, 241, 0.25); width: 40px;"/>
+                    <ui:Label name="Row7Address" text="—" style="font-size: 13px; color: rgba(241, 241, 241, 0.50); flex-grow: 1;"/>
+                    <ui:Label name="Row7Score" text="—" style="font-size: 14px; -unity-font-style: bold; color: rgb(241, 241, 241); width: 70px; -unity-text-align: middle-right;"/>
+                    <ui:Label name="Row7Count" text="—" style="font-size: 12px; color: rgba(241, 241, 241, 0.25); width: 60px; -unity-text-align: middle-right;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="Row8" class="glass-card fill-width" style="padding: 12px 16px; margin-bottom: 6px; border-radius: 12px;">
+                <ui:VisualElement class="row-between">
+                    <ui:Label text="8" style="font-size: 13px; color: rgba(241, 241, 241, 0.25); width: 40px;"/>
+                    <ui:Label name="Row8Address" text="—" style="font-size: 13px; color: rgba(241, 241, 241, 0.50); flex-grow: 1;"/>
+                    <ui:Label name="Row8Score" text="—" style="font-size: 14px; -unity-font-style: bold; color: rgb(241, 241, 241); width: 70px; -unity-text-align: middle-right;"/>
+                    <ui:Label name="Row8Count" text="—" style="font-size: 12px; color: rgba(241, 241, 241, 0.25); width: 60px; -unity-text-align: middle-right;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Your rank highlight -->
+            <ui:VisualElement class="divider"/>
+            <ui:VisualElement name="YourRankRow" class="glass-card-pink fill-width" style="padding: 12px 16px; border-radius: 12px;">
+                <ui:VisualElement class="row-between">
+                    <ui:Label name="YourRankNum" text="—" style="font-size: 13px; color: rgb(255, 110, 180); width: 40px;"/>
+                    <ui:VisualElement class="row" style="flex-grow: 1; gap: 6px;">
+                        <ui:VisualElement class="badge-dot"/>
+                        <ui:Label text="YOU" style="font-size: 13px; color: rgb(255, 110, 180);"/>
+                    </ui:VisualElement>
+                    <ui:Label name="YourScore" text="—" style="font-size: 14px; -unity-font-style: bold; color: rgb(255, 45, 120); width: 70px; -unity-text-align: middle-right;"/>
+                    <ui:Label name="YourCount" text="—" style="font-size: 12px; color: rgb(255, 110, 180); width: 60px; -unity-text-align: middle-right;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

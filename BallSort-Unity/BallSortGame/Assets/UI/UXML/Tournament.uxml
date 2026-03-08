@@ -1,0 +1,155 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/Variables.uss" />
+    <Style src="../USS/Common.uss" />
+
+    <ui:VisualElement name="TournamentScreen" class="screen col" style="background-color: rgb(5, 5, 8);">
+
+        <!-- Header -->
+        <ui:VisualElement class="row-between" style="
+            padding: 16px 20px;
+            border-bottom-width: 1px;
+            border-color: rgba(255, 255, 255, 0.08);
+        ">
+            <ui:Button name="BackBtn" class="btn-ghost" style="padding: 8px 0;">
+                <ui:Label text="← Back" style="font-size: 13px; color: rgba(241, 241, 241, 0.25);"/>
+            </ui:Button>
+            <ui:Label text="TOURNAMENT" style="
+                font-size: 13px; -unity-font-style: bold;
+                color: rgb(241, 241, 241); letter-spacing: 3px;
+            "/>
+            <ui:VisualElement style="width: 60px;"/>
+        </ui:VisualElement>
+
+        <ui:ScrollView class="screen-content" style="gap: 16px;">
+
+            <!-- Prize pool banner -->
+            <ui:VisualElement name="PrizeBanner" class="glass-card-pink fill-width" style="
+                padding: 20px; margin-bottom: 4px; border-radius: 20px;
+            ">
+                <ui:VisualElement class="row-between" style="margin-bottom: 12px;">
+                    <ui:VisualElement>
+                        <ui:Label text="PRIZE POOL" class="label-mono" style="margin-bottom: 4px;"/>
+                        <ui:Label name="PrizePoolLabel" text="0 SOL" style="
+                            font-size: 32px; -unity-font-style: bold;
+                            color: rgb(255, 45, 120);
+                        "/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="col" style="align-items: flex-end;">
+                        <ui:Label text="ENDS IN" class="label-mono" style="margin-bottom: 4px;"/>
+                        <ui:Label name="CountdownLabel" text="—" style="
+                            font-size: 22px; -unity-font-style: bold;
+                            color: rgb(241, 241, 241);
+                        "/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- Progress bar showing entries -->
+                <ui:VisualElement class="row-between" style="margin-bottom: 6px;">
+                    <ui:Label text="ENTRIES" class="label-mono"/>
+                    <ui:Label name="EntriesLabel" text="0" class="label-pink"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="progress-track">
+                    <ui:VisualElement name="EntriesFill" class="progress-fill" style="width: 0%;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Active tournament card -->
+            <ui:Label text="ACTIVE TOURNAMENT" class="label-mono" style="margin-bottom: 8px;"/>
+
+            <ui:VisualElement name="TournamentCard" class="glass-card fill-width" style="border-radius: 20px; padding: 20px; margin-bottom: 8px;">
+
+                <ui:VisualElement class="row-between" style="margin-bottom: 16px;">
+                    <ui:VisualElement>
+                        <ui:Label name="TournamentTitle" text="Weekly Challenge" style="
+                            font-size: 18px; -unity-font-style: bold; color: rgb(241, 241, 241);
+                        "/>
+                        <ui:Label name="TournamentDifficulty" text="MEDIUM DIFFICULTY" class="label-mono" style="margin-top: 4px;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="StatusBadge" class="badge">
+                        <ui:Label name="StatusLabel" text="OPEN" style="font-size: 11px; color: rgb(255, 110, 180); letter-spacing: 2px;"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- Stats row -->
+                <ui:VisualElement class="row" style="gap: 10px; margin-bottom: 20px;">
+                    <ui:VisualElement class="stat-card">
+                        <ui:Label text="🎟" style="font-size: 14px; -unity-text-align: middle-center;"/>
+                        <ui:Label name="EntryFeeLabel" text="0" class="stat-value"/>
+                        <ui:Label text="ENTRY (lamports)" class="stat-label"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="stat-card">
+                        <ui:Label text="👥" style="font-size: 14px; -unity-text-align: middle-center;"/>
+                        <ui:Label name="TotalEntriesLabel" text="0" class="stat-value"/>
+                        <ui:Label text="PLAYERS" class="stat-label"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="stat-card">
+                        <ui:Label text="✅" style="font-size: 14px; -unity-text-align: middle-center;"/>
+                        <ui:Label name="CompletersLabel" text="0" class="stat-value"/>
+                        <ui:Label text="SOLVED" class="stat-label"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <!-- Entry button -->
+                <ui:Button name="EnterBtn" class="btn-primary fill-width" style="margin-bottom: 10px;">
+                    <ui:Label text="Enter Tournament" style="
+                        font-size: 17px; -unity-font-style: bold;
+                        color: white; -unity-text-align: middle-center;
+                    "/>
+                </ui:Button>
+                <ui:Label text="Entry fee is refundable if tournament is cancelled"
+                    class="body-small" style="-unity-text-align: middle-center;"/>
+
+            </ui:VisualElement>
+
+            <!-- Already entered state (hidden by default) -->
+            <ui:VisualElement name="AlreadyEnteredCard" class="glass-card fill-width" style="
+                border-radius: 20px; padding: 20px; display: none;
+                border-color: rgba(255, 45, 120, 0.25);
+            ">
+                <ui:VisualElement class="row" style="gap: 12px; margin-bottom: 16px;">
+                    <ui:Label text="⚡" style="font-size: 20px;"/>
+                    <ui:VisualElement>
+                        <ui:Label text="You're Entered!" style="
+                            font-size: 16px; -unity-font-style: bold; color: rgb(241, 241, 241);
+                        "/>
+                        <ui:Label text="Complete the puzzle to post your score"
+                            class="body-small" style="margin-top: 2px;"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Button name="PlayTournamentBtn" class="btn-primary fill-width">
+                    <ui:Label text="Play Now →" style="
+                        font-size: 17px; -unity-font-style: bold;
+                        color: white; -unity-text-align: middle-center;
+                    "/>
+                </ui:Button>
+            </ui:VisualElement>
+
+            <!-- How it works -->
+            <ui:Label text="HOW IT WORKS" class="label-mono" style="margin-top: 8px; margin-bottom: 8px;"/>
+            <ui:VisualElement class="glass-card fill-width" style="padding: 16px 20px; border-radius: 16px;">
+                <ui:VisualElement class="row" style="gap: 10px; margin-bottom: 10px;">
+                    <ui:Label text="1" style="
+                        font-size: 12px; color: rgb(255, 110, 180);
+                        width: 20px; -unity-text-align: middle-center;
+                    "/>
+                    <ui:Label text="Pay entry fee to join" class="body-small" style="flex-grow: 1;"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="row" style="gap: 10px; margin-bottom: 10px;">
+                    <ui:Label text="2" style="
+                        font-size: 12px; color: rgb(255, 110, 180);
+                        width: 20px; -unity-text-align: middle-center;
+                    "/>
+                    <ui:Label text="Solve the puzzle — fewer moves = higher score" class="body-small" style="flex-grow: 1; white-space: normal;"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="row" style="gap: 10px;">
+                    <ui:Label text="3" style="
+                        font-size: 12px; color: rgb(255, 110, 180);
+                        width: 20px; -unity-text-align: middle-center;
+                    "/>
+                    <ui:Label text="Top completers share the prize pool on-chain" class="body-small" style="flex-grow: 1; white-space: normal;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

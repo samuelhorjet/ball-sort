@@ -1,0 +1,72 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/Variables.uss" />
+    <Style src="../USS/Common.uss" />
+
+    <ui:VisualElement name="TutorialSuccessScreen" class="screen center" style="background-color: rgb(5, 5, 8);">
+
+        <!-- Glow orb -->
+        <ui:VisualElement style="
+            position: absolute; width: 500px; height: 500px;
+            border-radius: 999px; background-color: rgba(255,45,120,0.07);
+            left: 50%; top: 50%; translate: -50% -50%;
+        "/>
+
+        <ui:VisualElement class="col center" style="width: 88%; max-width: 340px;">
+
+            <!-- Trophy icon -->
+            <ui:Label text="🎉" style="
+                font-size: 72px;
+                -unity-text-align: middle-center;
+                margin-bottom: 8px;
+            "/>
+
+            <ui:Label text="Tutorial Complete!" class="heading-md" style="
+                -unity-text-align: middle-center;
+                margin-bottom: 6px;
+            "/>
+            <ui:Label text="You've mastered the basics. Now play on-chain and compete for real scores."
+                class="body-small" style="
+                    -unity-text-align: middle-center;
+                    margin-bottom: 32px;
+                    white-space: normal;
+                "/>
+
+            <!-- What you learned -->
+            <ui:VisualElement class="glass-card fill-width" style="margin-bottom: 24px; padding: 16px 20px;">
+                <ui:Label text="WHAT'S NEXT" class="label-mono" style="margin-bottom: 12px;"/>
+
+                <ui:VisualElement class="row" style="gap: 10px; margin-bottom: 10px;">
+                    <ui:Label text="⚡" style="font-size: 14px;"/>
+                    <ui:Label text="Session key signs moves automatically — no wallet popups"
+                        class="body-small" style="flex-grow: 1; white-space: normal;"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="row" style="gap: 10px; margin-bottom: 10px;">
+                    <ui:Label text="🎲" style="font-size: 14px;"/>
+                    <ui:Label text="Ball layouts are randomized by on-chain VRF"
+                        class="body-small" style="flex-grow: 1; white-space: normal;"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="row" style="gap: 10px;">
+                    <ui:Label text="🏆" style="font-size: 14px;"/>
+                    <ui:Label text="Scores are recorded permanently on Solana"
+                        class="body-small" style="flex-grow: 1; white-space: normal;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Connect wallet CTA -->
+            <ui:Button name="ConnectBtn" class="btn-primary fill-width" style="margin-bottom: 12px;">
+                <ui:Label text="Connect Wallet &amp; Play" style="
+                    font-size: 17px; -unity-font-style: bold;
+                    color: white; -unity-text-align: middle-center;
+                "/>
+            </ui:Button>
+
+            <ui:Button name="TryAgainBtn" class="btn-ghost fill-width">
+                <ui:Label text="Play Tutorial Again" style="
+                    font-size: 14px; color: rgba(241, 241, 241, 0.25);
+                    -unity-text-align: middle-center;
+                "/>
+            </ui:Button>
+
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

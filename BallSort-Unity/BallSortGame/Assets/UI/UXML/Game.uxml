@@ -1,0 +1,85 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/Variables.uss" />
+    <Style src="../USS/Common.uss" />
+    <Style src="../USS/Game.uss" />
+
+    <ui:VisualElement name="GameScreen" class="screen col">
+
+        <!-- HUD top bar -->
+        <ui:VisualElement name="GameHUD" class="game-hud">
+            <ui:Button name="ExitBtn" class="btn-ghost" style="padding: 6px 10px;">
+                <ui:Label text="✕ Exit" style="font-size: 12px; color: rgba(241, 241, 241, 0.25);"/>
+            </ui:Button>
+
+            <ui:VisualElement class="row" style="column-column-gap: 28px;">
+                <ui:VisualElement class="hud-stat">
+                    <ui:Label name="TimerLabel" text="00:00" class="hud-value"/>
+                    <ui:Label text="TIME" class="hud-label"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="hud-stat">
+                    <ui:Label name="MovesLabel" text="0" class="hud-value"/>
+                    <ui:Label text="MOVES" class="hud-label"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="hud-stat">
+                    <ui:Label name="UndosLabel" text="0" class="hud-value"
+                        style="color: rgba(241, 241, 241, 0.25);"/>
+                    <ui:Label text="UNDOS" class="hud-label"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement style="width: 64px;"> <!-- spacer -->
+                <ui:Label name="TxIndicator" text="⚡" style="
+                    font-size: 12px; color: rgb(255, 45, 120);
+                    display: none; -unity-text-align: middle-right;
+                "/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <!-- Board area (populated entirely by BoardRenderer.cs) -->
+        <ui:VisualElement name="BoardArea" class="board-root flex-1">
+            <ui:VisualElement name="BoardRowTop" class="board-row fill-width"/>
+            <ui:VisualElement name="BoardRowBottom" class="board-row fill-width"/>
+        </ui:VisualElement>
+
+        <!-- Control bar -->
+        <ui:VisualElement class="game-controls">
+            <ui:Button name="UndoBtn" class="btn-secondary flex-1">
+                <ui:Label text="↩  Undo" style="
+                    font-size: 14px; color: rgba(241, 241, 241, 0.50);
+                    -unity-text-align: middle-center;
+                "/>
+            </ui:Button>
+            <ui:Button name="AbandonBtn" style="
+                flex-grow: 1;
+                background-color: rgba(239,68,68,0.10);
+                border-width: 1px; border-color: rgba(239,68,68,0.25);
+                border-radius: 12px; padding: 14px;
+            ">
+                <ui:Label text="🚩  Abandon" style="
+                    font-size: 14px; color: rgb(239, 68, 68);
+                    -unity-text-align: middle-center;
+                "/>
+            </ui:Button>
+        </ui:VisualElement>
+
+        <!-- Abandon confirm modal (hidden by default) -->
+        <ui:VisualElement name="AbandonModal" class="modal-backdrop" style="display: none;">
+            <ui:VisualElement class="modal-panel col center" style="column-column-gap: 0;">
+                <ui:Label text="🚩" style="font-size: 40px; margin-bottom: 12px; -unity-text-align: middle-center;"/>
+                <ui:Label text="Abandon Puzzle?" class="heading-sm"
+                    style="-unity-text-align: middle-center; margin-bottom: 8px;"/>
+                <ui:Label text="Your progress will be lost. This cannot be undone."
+                    class="body-small" style="-unity-text-align: middle-center; margin-bottom: 28px; white-space: normal;"/>
+                <ui:VisualElement class="row fill-width" style="column-column-gap: 12px;">
+                    <ui:Button name="AbandonCancelBtn" class="btn-secondary flex-1">
+                        <ui:Label text="Keep Playing" style="-unity-text-align: middle-center; font-size: 13px; color: rgba(241, 241, 241, 0.50);"/>
+                    </ui:Button>
+                    <ui:Button name="AbandonConfirmBtn" class="btn-danger flex-1">
+                        <ui:Label text="Abandon" style="-unity-text-align: middle-center; font-size: 13px;"/>
+                    </ui:Button>
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,22 @@
+// ─── Seeds (PDAs) ──────────────────────────────────────────────────────────────
+pub const SEED_GAME_CONFIG: &[u8] = b"game_config";
+pub const SEED_PLAYER_AUTH: &[u8] = b"player_auth";
+pub const SEED_PLAYER_PROFILE: &[u8] = b"player_profile";
+pub const SEED_TOURNAMENT: &[u8] = b"tournament";
+pub const SEED_TOURNAMENT_ENTRY: &[u8] = b"tournament_entry";
+pub const SEED_PUZZLE_BOARD: &[u8] = b"puzzle_board";
+pub const SEED_PUZZLE_STATS: &[u8] = b"puzzle_stats";
+
+pub const MAX_TREASURY_FEE_BPS: u16 = 2_000;
+pub const BPS_DENOMINATOR: u64 = 10_000;
+
+pub const MIN_SESSION_DURATION_SECS: i64 = 60;
+pub const MAX_SESSION_DURATION_SECS: i64 = 3_600;
+
+pub const PARIMUTUEL_SCALAR: u128 = 1_000_000_000_000;
+
+pub const ACHIEVEMENT_FIRST_SOLVE: u8 = 0;
+pub const ACHIEVEMENT_NO_UNDO: u8 = 1;
+pub const ACHIEVEMENT_SPEED_DEMON: u8 = 2;
+pub const ACHIEVEMENT_HARD_SOLVER: u8 = 3;
+pub const ACHIEVEMENT_CENTURION: u8 = 4;

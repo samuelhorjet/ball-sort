@@ -1,0 +1,64 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/Variables.uss" />
+    <Style src="../USS/Common.uss" />
+
+    <ui:VisualElement name="SolvedScreen" class="screen center">
+
+        <ui:VisualElement name="GlowOrb" style="
+            position: absolute; width: 400px; height: 400px;
+            border-radius: 999px; background-color: rgba(255,45,120,0.08);
+            left: 50%; top: 50%; translate: -50% -50%;
+        "/>
+
+        <ui:VisualElement class="modal-panel col center" style="max-width: 320px; width: 88%;">
+
+            <ui:Label text="🎉" style="font-size: 56px; -unity-text-align: middle-center; margin-bottom: 4px;"/>
+            <ui:Label text="Puzzle Solved!" class="heading-md"
+                style="-unity-text-align: middle-center; margin-bottom: 4px;"/>
+            <ui:Label name="DifficultyLabel" text="Custom Mode"
+                class="body-small" style="-unity-text-align: middle-center; margin-bottom: 24px;"/>
+
+            <!-- Score card -->
+            <ui:VisualElement class="glass-card fill-width" style="margin-bottom: 20px; padding: 20px;">
+                <ui:Label text="FINAL SCORE" class="label-mono"
+                    style="-unity-text-align: middle-center; margin-bottom: 6px;"/>
+                <ui:Label name="ScoreLabel" text="0"
+                    style="
+                        font-size: 52px; -unity-font-style: bold;
+                        color: rgb(255, 45, 120);
+                        -unity-text-align: middle-center;
+                    "/>
+            </ui:VisualElement>
+
+            <!-- Stats row -->
+            <ui:VisualElement class="row fill-width" style="gap: 10px; margin-bottom: 24px;">
+                <ui:VisualElement class="stat-card">
+                    <ui:Label text="🏆" style="font-size: 14px; -unity-text-align: middle-center;"/>
+                    <ui:Label name="MovesStatLabel" text="0" class="stat-value"/>
+                    <ui:Label text="MOVES" class="stat-label"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="stat-card">
+                    <ui:Label text="↩" style="font-size: 14px; -unity-text-align: middle-center;"/>
+                    <ui:Label name="UndosStatLabel" text="0" class="stat-value"/>
+                    <ui:Label text="UNDOS" class="stat-label"/>
+                </ui:VisualElement>
+                <ui:VisualElement class="stat-card">
+                    <ui:Label text="⏱" style="font-size: 14px; -unity-text-align: middle-center;"/>
+                    <ui:Label name="TimeStatLabel" text="0s" class="stat-value"/>
+                    <ui:Label text="TIME" class="stat-label"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Finalize CTA -->
+            <ui:Button name="FinalizeBtn" class="btn-primary fill-width" style="margin-bottom: 10px;">
+                <ui:Label text="⚡  Finalize On-Chain" style="
+                    font-size: 17px; -unity-font-style: bold;
+                    color: white; -unity-text-align: middle-center;
+                "/>
+            </ui:Button>
+            <ui:Label text="Records your score permanently on Solana"
+                class="body-small" style="-unity-text-align: middle-center;"/>
+
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

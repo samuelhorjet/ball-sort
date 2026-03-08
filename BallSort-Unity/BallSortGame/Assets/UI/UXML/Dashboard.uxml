@@ -1,0 +1,320 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/Variables.uss" />
+    <Style src="../USS/Common.uss" />
+
+    <ui:VisualElement name="DashboardScreen" class="screen col" style="background-color: rgb(5, 5, 8);">
+
+        <!-- ── Top bar ─────────────────────────────────────────────────────── -->
+        <ui:VisualElement name="TopBar" style="
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 20px 14px 20px;
+            border-bottom-width: 1px;
+            border-bottom-color: rgba(255,255,255,0.07);
+        ">
+            <!-- Logo -->
+            <ui:VisualElement style="flex-direction: row; align-items: center; column-gap: 10px;">
+                <ui:VisualElement style="
+                    width: 30px; height: 30px;
+                    border-radius: 999px;
+                    background-color: rgb(255, 45, 120);
+                "/>
+                <ui:Label text="BALLSORT" style="
+                    font-size: 15px;
+                    -unity-font-style: bold;
+                    color: rgb(241, 241, 241);
+                    letter-spacing: 4px;
+                "/>
+            </ui:VisualElement>
+
+            <!-- Wallet chip -->
+            <ui:Button name="WalletButton" style="
+                flex-direction: row;
+                align-items: center;
+                column-gap: 8px;
+                padding: 8px 14px;
+                background-color: rgba(255,255,255,0.05);
+                border-radius: 999px;
+                border-width: 1px;
+                border-color: rgba(255,255,255,0.10);
+            ">
+                <ui:VisualElement style="
+                    width: 7px; height: 7px;
+                    border-radius: 999px;
+                    background-color: rgb(34, 197, 94);
+                "/>
+                <ui:Label name="WalletLabel" text="5Ax3...9kRz" style="
+                    font-size: 12px;
+                    color: rgb(241, 241, 241);
+                    -unity-font-style: bold;
+                "/>
+            </ui:Button>
+        </ui:VisualElement>
+
+        <!-- ── Scrollable body ─────────────────────────────────────────────── -->
+        <ui:ScrollView name="ContentScroll" style="flex-grow: 1; padding: 20px 16px;">
+
+            <!-- Hero stats bar -->
+            <ui:VisualElement style="
+                flex-direction: row;
+                column-gap: 10px;
+                margin-bottom: 24px;
+            ">
+                <!-- Solved stat -->
+                <ui:VisualElement style="
+                    flex-grow: 1;
+                    background-color: rgba(255,255,255,0.04);
+                    border-radius: 16px;
+                    border-width: 1px;
+                    border-color: rgba(255,255,255,0.08);
+                    padding: 16px 12px;
+                    align-items: center;
+                ">
+                    <ui:Label name="SolvedCountLabel" text="0" style="
+                        font-size: 32px;
+                        -unity-font-style: bold;
+                        color: rgb(241, 241, 241);
+                        -unity-text-align: middle-center;
+                    "/>
+                    <ui:Label text="SOLVED" style="
+                        font-size: 10px;
+                        color: rgba(241,241,241,0.35);
+                        letter-spacing: 2px;
+                        -unity-text-align: middle-center;
+                        margin-top: 2px;
+                    "/>
+                </ui:VisualElement>
+
+                <!-- Best score stat -->
+                <ui:VisualElement style="
+                    flex-grow: 1;
+                    background-color: rgba(255, 45, 120, 0.06);
+                    border-radius: 16px;
+                    border-width: 1px;
+                    border-color: rgba(255, 45, 120, 0.20);
+                    padding: 16px 12px;
+                    align-items: center;
+                ">
+                    <ui:Label name="BestScoreLabel" text="—" style="
+                        font-size: 32px;
+                        -unity-font-style: bold;
+                        color: rgb(255, 110, 180);
+                        -unity-text-align: middle-center;
+                    "/>
+                    <ui:Label text="BEST SCORE" style="
+                        font-size: 10px;
+                        color: rgba(255,110,180,0.50);
+                        letter-spacing: 2px;
+                        -unity-text-align: middle-center;
+                        margin-top: 2px;
+                    "/>
+                </ui:VisualElement>
+
+                <!-- Wallet address stat -->
+                <ui:VisualElement style="
+                    flex-grow: 1;
+                    background-color: rgba(255,255,255,0.04);
+                    border-radius: 16px;
+                    border-width: 1px;
+                    border-color: rgba(255,255,255,0.08);
+                    padding: 16px 12px;
+                    align-items: center;
+                    justify-content: center;
+                ">
+                    <ui:Label text="WALLET" style="
+                        font-size: 10px;
+                        color: rgba(241,241,241,0.35);
+                        letter-spacing: 2px;
+                        -unity-text-align: middle-center;
+                        margin-bottom: 4px;
+                    "/>
+                    <ui:Label name="WalletAddressLabel" text="5Ax3...9kRz" style="
+                        font-size: 11px;
+                        -unity-font-style: bold;
+                        color: rgba(241,241,241,0.70);
+                        -unity-text-align: middle-center;
+                    "/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Section label -->
+            <ui:Label text="PLAY" style="
+                font-size: 11px;
+                color: rgba(241,241,241,0.25);
+                letter-spacing: 3px;
+                margin-bottom: 10px;
+                margin-left: 4px;
+            "/>
+
+            <!-- ── START GAME — primary CTA ──────────────────────────────── -->
+            <ui:Button name="StartGameBtn" style="
+                flex-direction: row;
+                align-items: center;
+                column-gap: 18px;
+                padding: 22px 20px;
+                background-color: rgb(255, 45, 120);
+                border-radius: 20px;
+                border-width: 0;
+                margin-bottom: 10px;
+            ">
+                <ui:VisualElement style="
+                    width: 52px; height: 52px;
+                    border-radius: 14px;
+                    background-color: rgba(255,255,255,0.18);
+                    align-items: center; justify-content: center;
+                ">
+                    <ui:Label text="▶" style="color: white; font-size: 22px; -unity-text-align: middle-center;"/>
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-grow: 1;">
+                    <ui:Label text="Start Game" style="
+                        font-size: 20px;
+                        -unity-font-style: bold;
+                        color: white;
+                    "/>
+                    <ui:Label text="Play a new on-chain puzzle" style="
+                        font-size: 12px;
+                        color: rgba(255,255,255,0.70);
+                        margin-top: 2px;
+                    "/>
+                </ui:VisualElement>
+                <ui:Label text="→" style="font-size: 20px; color: rgba(255,255,255,0.6);"/>
+            </ui:Button>
+
+            <!-- Section label -->
+            <ui:Label text="COMPETE" style="
+                font-size: 11px;
+                color: rgba(241,241,241,0.25);
+                letter-spacing: 3px;
+                margin-bottom: 10px;
+                margin-top: 14px;
+                margin-left: 4px;
+            "/>
+
+            <!-- ── Secondary menu rows ──────────────────────────────────── -->
+
+            <!-- Tournament -->
+            <ui:Button name="TournamentBtn" style="
+                flex-direction: row;
+                align-items: center;
+                column-gap: 16px;
+                padding: 16px 18px;
+                background-color: rgba(255,255,255,0.04);
+                border-radius: 16px;
+                border-width: 1px;
+                border-color: rgba(255,255,255,0.08);
+                margin-bottom: 8px;
+            ">
+                <ui:VisualElement style="
+                    width: 44px; height: 44px;
+                    border-radius: 12px;
+                    background-color: rgba(234,179,8,0.12);
+                    border-width: 1px;
+                    border-color: rgba(234,179,8,0.25);
+                    align-items: center; justify-content: center;
+                ">
+                    <ui:Label text="🏆" style="font-size: 20px; -unity-text-align: middle-center;"/>
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-grow: 1;">
+                    <ui:Label text="Tournament" style="
+                        font-size: 16px; -unity-font-style: bold;
+                        color: rgb(241, 241, 241);
+                    "/>
+                    <ui:Label text="Compete for prizes on-chain" style="
+                        font-size: 12px; color: rgba(241,241,241,0.40); margin-top: 2px;
+                    "/>
+                </ui:VisualElement>
+                <ui:Label text="›" style="font-size: 22px; color: rgba(255,255,255,0.2);"/>
+            </ui:Button>
+
+            <!-- Leaderboard -->
+            <ui:Button name="LeaderboardBtn" style="
+                flex-direction: row;
+                align-items: center;
+                column-gap: 16px;
+                padding: 16px 18px;
+                background-color: rgba(255,255,255,0.04);
+                border-radius: 16px;
+                border-width: 1px;
+                border-color: rgba(255,255,255,0.08);
+                margin-bottom: 8px;
+            ">
+                <ui:VisualElement style="
+                    width: 44px; height: 44px;
+                    border-radius: 12px;
+                    background-color: rgba(59,130,246,0.12);
+                    border-width: 1px;
+                    border-color: rgba(59,130,246,0.25);
+                    align-items: center; justify-content: center;
+                ">
+                    <ui:Label text="📊" style="font-size: 20px; -unity-text-align: middle-center;"/>
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-grow: 1;">
+                    <ui:Label text="Leaderboard" style="
+                        font-size: 16px; -unity-font-style: bold;
+                        color: rgb(241, 241, 241);
+                    "/>
+                    <ui:Label text="Top solvers globally" style="
+                        font-size: 12px; color: rgba(241,241,241,0.40); margin-top: 2px;
+                    "/>
+                </ui:VisualElement>
+                <ui:Label text="›" style="font-size: 22px; color: rgba(255,255,255,0.2);"/>
+            </ui:Button>
+
+            <!-- Profile -->
+            <ui:Button name="ProfileBtn" style="
+                flex-direction: row;
+                align-items: center;
+                column-gap: 16px;
+                padding: 16px 18px;
+                background-color: rgba(255,255,255,0.04);
+                border-radius: 16px;
+                border-width: 1px;
+                border-color: rgba(255,255,255,0.08);
+                margin-bottom: 24px;
+            ">
+                <ui:VisualElement style="
+                    width: 44px; height: 44px;
+                    border-radius: 12px;
+                    background-color: rgba(16,185,129,0.12);
+                    border-width: 1px;
+                    border-color: rgba(16,185,129,0.25);
+                    align-items: center; justify-content: center;
+                ">
+                    <ui:Label text="👤" style="font-size: 20px; -unity-text-align: middle-center;"/>
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-grow: 1;">
+                    <ui:Label text="Profile" style="
+                        font-size: 16px; -unity-font-style: bold;
+                        color: rgb(241, 241, 241);
+                    "/>
+                    <ui:Label text="Stats and achievements" style="
+                        font-size: 12px; color: rgba(241,241,241,0.40); margin-top: 2px;
+                    "/>
+                </ui:VisualElement>
+                <ui:Label text="›" style="font-size: 22px; color: rgba(255,255,255,0.2);"/>
+            </ui:Button>
+
+            <!-- Session hint footer -->
+            <ui:VisualElement style="
+                flex-direction: row;
+                align-items: center;
+                column-gap: 10px;
+                padding: 12px 16px;
+                background-color: rgba(255,45,120,0.05);
+                border-radius: 12px;
+                border-width: 1px;
+                border-color: rgba(255,45,120,0.15);
+            ">
+                <ui:Label text="⚡" style="font-size: 14px;"/>
+                <ui:Label text="Session key auto-signs moves — no wallet pop-ups during play" style="
+                    font-size: 11px;
+                    color: rgba(241,241,241,0.35);
+                    flex-grow: 1;
+                    white-space: normal;
+                "/>
+            </ui:VisualElement>
+
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

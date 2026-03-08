@@ -1,0 +1,95 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/Variables.uss" />
+    <Style src="../USS/Common.uss" />
+
+    <ui:VisualElement name="GameLoadingScreen" class="screen center">
+
+        <ui:VisualElement name="GlowOrb" style="
+            position: absolute; width: 300px; height: 300px;
+            border-radius: 999px; background-color: rgba(255,45,120,0.06);
+            left: 50%; top: 40%; translate: -50% -50%;
+        "/>
+
+        <ui:VisualElement class="col center" style="width: 90%; max-width: 360px;">
+
+            <!-- Spinner -->
+            <ui:VisualElement name="Spinner" class="spinner" style="margin-bottom: 20px;"/>
+
+            <ui:Label text="Preparing Puzzle" class="heading-sm"
+                style="-unity-text-align: middle-center; margin-bottom: 6px;"/>
+            <ui:Label name="LoadingSubLabel" text="Setting everything up..."
+                class="body-small" style="-unity-text-align: middle-center; margin-bottom: 40px;"/>
+
+            <!-- Steps list -->
+            <ui:VisualElement name="StepsList" class="fill-width" style="column-gap: 6px; margin-bottom: 24px;">
+
+                <ui:VisualElement name="Step_Init" class="step-item step-item--active">
+                    <ui:VisualElement name="StepIcon_Init" class="step-icon step-icon--active">
+                        <ui:Label name="StepCheck_Init" text="" style="font-size: 11px; color: rgb(34, 197, 94); -unity-text-align: middle-center;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="col">
+                        <ui:Label text="Initializing Puzzle" style="font-size: 13px; color: rgb(241, 241, 241);"/>
+                        <ui:Label text="Requesting VRF randomness on-chain" class="body-small"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement name="Step_VRF" class="step-item" style="opacity: 0.3;">
+                    <ui:VisualElement name="StepIcon_VRF" class="step-icon step-icon--pending">
+                        <ui:Label name="StepCheck_VRF" text="" style="font-size: 11px; color: rgb(34, 197, 94); -unity-text-align: middle-center;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="col">
+                        <ui:Label text="Waiting for VRF" style="font-size: 13px; color: rgba(241, 241, 241, 0.50);"/>
+                        <ui:Label text="Oracle generating provably fair seed" class="body-small"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement name="Step_Perms" class="step-item" style="opacity: 0.3;">
+                    <ui:VisualElement name="StepIcon_Perms" class="step-icon step-icon--pending">
+                        <ui:Label name="StepCheck_Perms" text="" style="font-size: 11px; color: rgb(34, 197, 94); -unity-text-align: middle-center;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="col">
+                        <ui:Label text="Creating Permissions" style="font-size: 13px; color: rgba(241, 241, 241, 0.50);"/>
+                        <ui:Label text="Setting up Ephemeral Rollup access" class="body-small"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement name="Step_DelegPerms" class="step-item" style="opacity: 0.3;">
+                    <ui:VisualElement name="StepIcon_DelegPerms" class="step-icon step-icon--pending">
+                        <ui:Label name="StepCheck_DelegPerms" text="" style="font-size: 11px; color: rgb(34, 197, 94); -unity-text-align: middle-center;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="col">
+                        <ui:Label text="Delegating Permissions" style="font-size: 13px; color: rgba(241, 241, 241, 0.50);"/>
+                        <ui:Label text="Locking accounts to ER validator" class="body-small"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement name="Step_Deleg" class="step-item" style="opacity: 0.3;">
+                    <ui:VisualElement name="StepIcon_Deleg" class="step-icon step-icon--pending">
+                        <ui:Label name="StepCheck_Deleg" text="" style="font-size: 11px; color: rgb(34, 197, 94); -unity-text-align: middle-center;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="col">
+                        <ui:Label text="Delegating Puzzle" style="font-size: 13px; color: rgba(241, 241, 241, 0.50);"/>
+                        <ui:Label text="Moving board to Ephemeral Rollup" class="body-small"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+                <ui:VisualElement name="Step_Start" class="step-item" style="opacity: 0.3;">
+                    <ui:VisualElement name="StepIcon_Start" class="step-icon step-icon--pending">
+                        <ui:Label name="StepCheck_Start" text="" style="font-size: 11px; color: rgb(34, 197, 94); -unity-text-align: middle-center;"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="col">
+                        <ui:Label text="Building Board" style="font-size: 13px; color: rgba(241, 241, 241, 0.50);"/>
+                        <ui:Label text="Shuffling balls from VRF seed" class="body-small"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
+            <!-- Overall progress bar -->
+            <ui:VisualElement class="progress-track fill-width">
+                <ui:VisualElement name="OverallFill" class="progress-fill" style="width: 5%;"/>
+            </ui:VisualElement>
+
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

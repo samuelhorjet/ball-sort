@@ -1,0 +1,166 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="../USS/Variables.uss" />
+    <Style src="../USS/Common.uss" />
+
+    <ui:VisualElement name="ProfileScreen" class="screen col" style="background-color: rgb(5, 5, 8);">
+
+        <!-- Header -->
+        <ui:VisualElement class="row-between" style="
+            padding: 16px 20px;
+            border-bottom-width: 1px;
+            border-color: rgba(255, 255, 255, 0.08);
+        ">
+            <ui:Button name="BackBtn" class="btn-ghost" style="padding: 8px 0;">
+                <ui:Label text="← Back" style="font-size: 13px; color: rgba(241, 241, 241, 0.25);"/>
+            </ui:Button>
+            <ui:Label text="PROFILE" style="
+                font-size: 13px; -unity-font-style: bold;
+                color: rgb(241, 241, 241); letter-spacing: 3px;
+            "/>
+            <ui:VisualElement style="width: 60px;"/>
+        </ui:VisualElement>
+
+        <ui:ScrollView class="screen-content" style="gap: 16px;">
+
+            <!-- Identity card -->
+            <ui:VisualElement class="glass-card fill-width" style="padding: 20px; margin-bottom: 4px;">
+                <ui:VisualElement class="row" style="gap: 14px; margin-bottom: 16px;">
+                    <!-- Avatar circle -->
+                    <ui:VisualElement style="
+                        width: 52px; height: 52px; border-radius: 999px;
+                        background-color: rgba(255, 45, 120, 0.20);
+                        border-width: 2px; border-color: rgba(255, 45, 120, 0.25);
+                        align-items: center; justify-content: center;
+                        flex-shrink: 0;
+                    ">
+                        <ui:Label text="◆" style="font-size: 20px; color: rgb(255, 45, 120);"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="col" style="flex-grow: 1; justify-content: center;">
+                        <ui:Label name="WalletLabel" text="Not connected" style="
+                            font-size: 16px; -unity-font-style: bold; color: rgb(241, 241, 241);
+                        "/>
+                        <ui:VisualElement class="row" style="gap: 6px; margin-top: 4px;">
+                            <ui:VisualElement class="badge-dot-green"/>
+                            <ui:Label text="Devnet" style="font-size: 11px; color: rgba(241, 241, 241, 0.25);"/>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="divider" style="margin-top: 0; margin-bottom: 14px;"/>
+                <ui:VisualElement class="row" style="gap: 10px;">
+                    <ui:VisualElement class="stat-card">
+                        <ui:Label name="StartedLabel" text="0" class="stat-value"/>
+                        <ui:Label text="STARTED" class="stat-label"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="stat-card">
+                        <ui:Label name="SolvedLabel" text="0" class="stat-value" style="color: rgb(255, 45, 120);"/>
+                        <ui:Label text="SOLVED" class="stat-label"/>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="stat-card">
+                        <ui:Label name="WinRateLabel" text="0%" class="stat-value"/>
+                        <ui:Label text="WIN RATE" class="stat-label"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <!-- Best scores -->
+            <ui:Label text="BEST SCORES" class="label-mono" style="margin-bottom: 8px;"/>
+            <ui:VisualElement class="glass-card fill-width" style="padding: 16px 20px; border-radius: 16px; margin-bottom: 4px;">
+
+                <!-- Easy -->
+                <ui:VisualElement class="row-between" style="padding: 10px 0; border-bottom-width: 1px; border-color: rgba(255, 255, 255, 0.08);">
+                    <ui:VisualElement class="row" style="gap: 10px;">
+                        <ui:VisualElement style="
+                            width: 8px; height: 8px; border-radius: 999px;
+                            background-color: rgb(34, 197, 94);
+                        "/>
+                        <ui:Label text="Easy" style="font-size: 14px; color: rgba(241, 241, 241, 0.50);"/>
+                    </ui:VisualElement>
+                    <ui:Label name="BestEasyLabel" text="—" style="
+                        font-size: 16px; -unity-font-style: bold; color: rgb(241, 241, 241);
+                    "/>
+                </ui:VisualElement>
+
+                <!-- Medium -->
+                <ui:VisualElement class="row-between" style="padding: 10px 0; border-bottom-width: 1px; border-color: rgba(255, 255, 255, 0.08);">
+                    <ui:VisualElement class="row" style="gap: 10px;">
+                        <ui:VisualElement style="
+                            width: 8px; height: 8px; border-radius: 999px;
+                            background-color: rgb(234, 179, 8);
+                        "/>
+                        <ui:Label text="Medium" style="font-size: 14px; color: rgba(241, 241, 241, 0.50);"/>
+                    </ui:VisualElement>
+                    <ui:Label name="BestMediumLabel" text="—" style="
+                        font-size: 16px; -unity-font-style: bold; color: rgb(241, 241, 241);
+                    "/>
+                </ui:VisualElement>
+
+                <!-- Hard -->
+                <ui:VisualElement class="row-between" style="padding: 10px 0;">
+                    <ui:VisualElement class="row" style="gap: 10px;">
+                        <ui:VisualElement style="
+                            width: 8px; height: 8px; border-radius: 999px;
+                            background-color: rgb(239, 68, 68);
+                        "/>
+                        <ui:Label text="Hard" style="font-size: 14px; color: rgba(241, 241, 241, 0.50);"/>
+                    </ui:VisualElement>
+                    <ui:Label name="BestHardLabel" text="—" style="
+                        font-size: 16px; -unity-font-style: bold; color: rgb(241, 241, 241);
+                    "/>
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
+            <!-- Achievements -->
+            <ui:Label text="ACHIEVEMENTS" class="label-mono" style="margin-bottom: 8px;"/>
+            <ui:VisualElement class="glass-card fill-width" style="padding: 16px 20px; border-radius: 16px; margin-bottom: 4px;">
+
+                <ui:VisualElement class="row" style="gap: 14px; padding: 8px 0; border-bottom-width: 1px; border-color: rgba(255, 255, 255, 0.08);">
+                    <ui:Label text="🎯" style="font-size: 22px;"/>
+                    <ui:VisualElement class="col flex-1">
+                        <ui:Label text="First Solve" style="font-size: 14px; -unity-font-style: bold; color: rgb(241, 241, 241);"/>
+                        <ui:Label text="Complete your first on-chain puzzle" class="body-small"/>
+                    </ui:VisualElement>
+                    <ui:Label name="Ach1Check" text="○" style="font-size: 18px; color: rgba(241, 241, 241, 0.25);"/>
+                </ui:VisualElement>
+
+                <ui:VisualElement class="row" style="gap: 14px; padding: 8px 0; border-bottom-width: 1px; border-color: rgba(255, 255, 255, 0.08);">
+                    <ui:Label text="⚡" style="font-size: 22px;"/>
+                    <ui:VisualElement class="col flex-1">
+                        <ui:Label text="Speed Solver" style="font-size: 14px; -unity-font-style: bold; color: rgb(241, 241, 241);"/>
+                        <ui:Label text="Solve a puzzle in under 60 seconds" class="body-small"/>
+                    </ui:VisualElement>
+                    <ui:Label name="Ach2Check" text="○" style="font-size: 18px; color: rgba(241, 241, 241, 0.25);"/>
+                </ui:VisualElement>
+
+                <ui:VisualElement class="row" style="gap: 14px; padding: 8px 0; border-bottom-width: 1px; border-color: rgba(255, 255, 255, 0.08);">
+                    <ui:Label text="🧠" style="font-size: 22px;"/>
+                    <ui:VisualElement class="col flex-1">
+                        <ui:Label text="No Undo" style="font-size: 14px; -unity-font-style: bold; color: rgb(241, 241, 241);"/>
+                        <ui:Label text="Solve without using undo once" class="body-small"/>
+                    </ui:VisualElement>
+                    <ui:Label name="Ach3Check" text="○" style="font-size: 18px; color: rgba(241, 241, 241, 0.25);"/>
+                </ui:VisualElement>
+
+                <ui:VisualElement class="row" style="gap: 14px; padding: 8px 0;">
+                    <ui:Label text="🏆" style="font-size: 22px;"/>
+                    <ui:VisualElement class="col flex-1">
+                        <ui:Label text="Tournament Winner" style="font-size: 14px; -unity-font-style: bold; color: rgb(241, 241, 241);"/>
+                        <ui:Label text="Win first place in any tournament" class="body-small"/>
+                    </ui:VisualElement>
+                    <ui:Label name="Ach4Check" text="○" style="font-size: 18px; color: rgba(241, 241, 241, 0.25);"/>
+                </ui:VisualElement>
+
+            </ui:VisualElement>
+
+            <!-- On-chain info -->
+            <ui:VisualElement class="glass-card fill-width" style="padding: 12px 16px; border-radius: 14px;">
+                <ui:VisualElement class="row" style="gap: 8px;">
+                    <ui:Label text="🔗" style="font-size: 12px;"/>
+                    <ui:Label text="All stats are stored on Solana — your progress is permanent and verifiable."
+                        class="body-small" style="flex-grow: 1; white-space: normal;"/>
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>
