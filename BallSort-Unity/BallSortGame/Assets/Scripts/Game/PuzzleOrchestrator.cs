@@ -20,7 +20,7 @@ namespace BallSort.Game
         public static PuzzleOrchestrator Instance { get; private set; }
 
         // ── Cached account data ───────────────────────────────────────────────
-        public Blockchain.PlayerAuth  CurrentPlayerAuth  { get; private set; }
+        public Blockchain.PlayerAuth CurrentPlayerAuth { get; private set; }
         public Blockchain.PuzzleBoard CurrentPuzzleBoard { get; private set; }
         public Blockchain.PuzzleStats CurrentPuzzleStats { get; private set; }
 
@@ -35,11 +35,11 @@ namespace BallSort.Game
 
         public async Task EnsurePlayerAuthAsync()
         {
-            var wallet    = Core.WalletManager.Instance;
+            var wallet = Core.WalletManager.Instance;
             var playerKey = wallet.PublicKey;
-            var (playerAuthPDA, _)   = Blockchain.PDAHelper.GetPlayerAuthPDA(playerKey);
-            var (playerProfilePDA,_) = Blockchain.PDAHelper.GetPlayerProfilePDA(playerKey);
-            var (gameConfigPDA, _)   = Blockchain.PDAHelper.GetGameConfigPDA();
+            var (playerAuthPDA, _) = Blockchain.PDAHelper.GetPlayerAuthPDA(playerKey);
+            var (playerProfilePDA, _) = Blockchain.PDAHelper.GetPlayerProfilePDA(playerKey);
+            var (gameConfigPDA, _) = Blockchain.PDAHelper.GetGameConfigPDA();
 
             var data = await SolanaManager.Instance.GetAccountDataAsync(playerAuthPDA);
 
@@ -48,7 +48,7 @@ namespace BallSort.Game
                 Debug.Log("[Orch] Creating player auth...");
                 var ix = Blockchain.ProgramClient.BuildCreatePlayerAuthIx(
                     playerKey, playerAuthPDA, gameConfigPDA, playerProfilePDA);
-                var tx  = await Blockchain.TxBuilder.BuildAsync(ix, feePayer: playerKey);
+                var tx = await Blockchain.TxBuilder.BuildAsync(ix, feePayer: playerKey);
                 var sig = await wallet.SignAndSendAsync(tx);
                 await SolanaManager.Instance.ConfirmTransactionAsync(sig);
                 data = await SolanaManager.Instance.GetAccountDataAsync(playerAuthPDA);
@@ -66,9 +66,9 @@ namespace BallSort.Game
                 Debug.LogWarning("[Orch] Stale active puzzle detected — abandoning before starting new one.");
                 try
                 {
-                    var staleIx  = Blockchain.ProgramClient.BuildAbandonPuzzleIx(
+                    var staleIx = Blockchain.ProgramClient.BuildAbandonPuzzleIx(
                         playerKey, playerAuthPDA, gameConfigPDA);
-                    var staleTx  = await Blockchain.TxBuilder.BuildAsync(staleIx, feePayer: playerKey);
+                    var staleTx = await Blockchain.TxBuilder.BuildAsync(staleIx, feePayer: playerKey);
                     var staleSig = await wallet.SignAndSendAsync(staleTx);
                     await SolanaManager.Instance.ConfirmTransactionAsync(staleSig);
 
@@ -88,8 +88,8 @@ namespace BallSort.Game
 
         public async Task StartNewPuzzleAsync(byte numTubes, byte ballsPerTube)
         {
-            var gstate    = GameStateManager.Instance;
-            var wallet    = Core.WalletManager.Instance;
+            var gstate = GameStateManager.Instance;
+            var wallet = Core.WalletManager.Instance;
             var playerKey = wallet.PublicKey;
 
             gstate.GoToGameLoading();
@@ -126,7 +126,7 @@ namespace BallSort.Game
                     difficulty: difficulty,
                     gameMode: 0
                 );
-                var initTx  = await Blockchain.TxBuilder.BuildAsync(initIx, feePayer: session.SessionPublicKey);
+                var initTx = await Blockchain.TxBuilder.BuildAsync(initIx, feePayer: session.SessionPublicKey);
                 var initSig = await session.SignAndSendL1Async(initTx);
                 await SolanaManager.Instance.ConfirmTransactionAsync(initSig);
 
@@ -143,9 +143,9 @@ namespace BallSort.Game
                 // start_puzzle after delegation causes AccountNotSigner (0xbbf).
                 gstate.SetLoadingStep(LoadingStep.StartingPuzzle,
                     "Shuffling balls from VRF seed...");
-                var startIx  = Blockchain.ProgramClient.BuildStartPuzzleIx(
+                var startIx = Blockchain.ProgramClient.BuildStartPuzzleIx(
                     session.SessionPublicKey, playerAuthPDA, gameConfigPDA, boardPDA, statsPDA);
-                var startTx  = await Blockchain.TxBuilder.BuildAsync(startIx, feePayer: session.SessionPublicKey);
+                var startTx = await Blockchain.TxBuilder.BuildAsync(startIx, feePayer: session.SessionPublicKey);
                 var startSig = await session.SignAndSendL1Async(startTx);
                 await SolanaManager.Instance.ConfirmTransactionAsync(startSig);
 
@@ -191,7 +191,7 @@ namespace BallSort.Game
 
         public async Task ApplyMoveAsync(byte fromTube, byte toTube)
         {
-            var session   = Core.SessionKeyManager.Instance;
+            var session = Core.SessionKeyManager.Instance;
             var playerKey = Core.WalletManager.Instance.PublicKey;
             var (playerAuthPDA, _) = Blockchain.PDAHelper.GetPlayerAuthPDA(playerKey);
             var (gameConfigPDA, _) = Blockchain.PDAHelper.GetGameConfigPDA();
@@ -203,17 +203,16 @@ namespace BallSort.Game
                 session.SessionPublicKey, playerAuthPDA, gameConfigPDA,
                 boardPDA, statsPDA, fromTube, toTube);
 
-            // Build v0 transaction signed by Session Key
             var tx = await Blockchain.TxBuilder.BuildAsync(ix, feePayer: session.SessionPublicKey);
 
-            // Optimistic local update immediately (no wait for chain confirmation)
+            // 1. UPDATE LOCAL STATE IMMEDIATELY (Authority is now here)
             ApplyMoveLocally(fromTube, toTube);
 
-            // Send to ER then refresh authoritative state from TEE
+            // 2. SEND TO TEE IN BACKGROUND (Don't 'await' the refresh)
+            // This makes the move feel instant while the chain catches up
             await session.SignAndSendErAsync(tx);
 
-            var (playerAuthPDA2, _) = Blockchain.PDAHelper.GetPlayerAuthPDA(playerKey);
-            await RefreshBoardAndStatsAsync(playerAuthPDA2);
+            // NOTE: We removed RefreshBoardAndStatsAsync() from here!
         }
 
         // ── Apply undo ────────────────────────────────────────────────────────
@@ -222,7 +221,7 @@ namespace BallSort.Game
         {
             if (!CurrentPuzzleBoard.HasUndo) return;
 
-            var session   = Core.SessionKeyManager.Instance;
+            var session = Core.SessionKeyManager.Instance;
             var playerKey = Core.WalletManager.Instance.PublicKey;
             var (playerAuthPDA, _) = Blockchain.PDAHelper.GetPlayerAuthPDA(playerKey);
             var (gameConfigPDA, _) = Blockchain.PDAHelper.GetGameConfigPDA();
@@ -232,7 +231,7 @@ namespace BallSort.Game
 
             var ix = Blockchain.ProgramClient.BuildApplyUndoIx(
                 session.SessionPublicKey, playerAuthPDA, gameConfigPDA, boardPDA, statsPDA);
-            
+
             var tx = await Blockchain.TxBuilder.BuildAsync(ix, feePayer: session.SessionPublicKey);
             await session.SignAndSendErAsync(tx);
 
@@ -244,8 +243,8 @@ namespace BallSort.Game
 
         public async Task AbandonPuzzleAsync()
         {
-            var session   = Core.SessionKeyManager.Instance;
-            var wallet    = Core.WalletManager.Instance;
+            var session = Core.SessionKeyManager.Instance;
+            var wallet = Core.WalletManager.Instance;
             var playerKey = wallet.PublicKey;
             var (playerAuthPDA, _) = Blockchain.PDAHelper.GetPlayerAuthPDA(playerKey);
             var (gameConfigPDA, _) = Blockchain.PDAHelper.GetGameConfigPDA();
@@ -259,9 +258,9 @@ namespace BallSort.Game
 
             // ── Step 2: Abandon on L1 (signed by session key) ────────────────
             // Matches the test: sessionKeypair signs abandonPuzzle on l1Connection.
-            var ix  = Blockchain.ProgramClient.BuildAbandonPuzzleIx(
+            var ix = Blockchain.ProgramClient.BuildAbandonPuzzleIx(
                 session.SessionPublicKey, playerAuthPDA, gameConfigPDA);
-            var tx  = await Blockchain.TxBuilder.BuildAsync(ix, feePayer: session.SessionPublicKey);
+            var tx = await Blockchain.TxBuilder.BuildAsync(ix, feePayer: session.SessionPublicKey);
             var sig = await session.SignAndSendL1Async(tx);
             await SolanaManager.Instance.ConfirmTransactionAsync(sig);
             Debug.Log($"[Orch] Puzzle abandoned. Sig: {sig}");
@@ -275,8 +274,8 @@ namespace BallSort.Game
 
         public async Task FinalizePuzzleAsync()
         {
-            var gstate    = GameStateManager.Instance;
-            var wallet    = Core.WalletManager.Instance;
+            var gstate = GameStateManager.Instance;
+            var wallet = Core.WalletManager.Instance;
             var playerKey = wallet.PublicKey;
 
             gstate.GoToFinalizing();
@@ -303,8 +302,8 @@ namespace BallSort.Game
                 var session = Core.SessionKeyManager.Instance;
                 var ix = Blockchain.ProgramClient.BuildFinalizePuzzleIx(
                     session.SessionPublicKey, playerAuthPDA, gameConfigPDA, statsPDA);
-                
-                var tx  = await Blockchain.TxBuilder.BuildAsync(ix, feePayer: session.SessionPublicKey);
+
+                var tx = await Blockchain.TxBuilder.BuildAsync(ix, feePayer: session.SessionPublicKey);
                 var sig = await session.SignAndSendL1Async(tx);
                 await SolanaManager.Instance.ConfirmTransactionAsync(sig);
 
@@ -340,7 +339,9 @@ namespace BallSort.Game
                 CurrentPuzzleStats = Blockchain.AccountDeserializer.DeserializePuzzleStats(statsData);
 
             UnityMainThread.Enqueue(() =>
-                BoardRenderer.Instance?.RefreshFromData(CurrentPuzzleBoard, CurrentPuzzleStats));
+            {
+                Board3DManager.Instance?.DrawBoard(CurrentPuzzleBoard);
+            });
 
             // Check for puzzle solved after each refresh
             if (CurrentPuzzleStats?.IsSolved == true)
@@ -357,22 +358,24 @@ namespace BallSort.Game
             if (CurrentPuzzleBoard == null) return;
             var board = CurrentPuzzleBoard;
             int fromLen = board.TubeLengths[from];
-            int toLen   = board.TubeLengths[to];
+            int toLen = board.TubeLengths[to];
             int baseFrom = from * Blockchain.PuzzleConstants.MAX_CAPACITY;
-            int baseTo   = to   * Blockchain.PuzzleConstants.MAX_CAPACITY;
+            int baseTo = to * Blockchain.PuzzleConstants.MAX_CAPACITY;
 
             byte ball = board.Balls[baseFrom + fromLen - 1];
             board.Balls[baseFrom + fromLen - 1] = 0;
             board.TubeLengths[from]--;
             board.Balls[baseTo + toLen] = ball;
             board.TubeLengths[to]++;
-            board.HasUndo  = true;
+            board.HasUndo = true;
             board.UndoFrom = from;
-            board.UndoTo   = to;
+            board.UndoTo = to;
             board.UndoBall = ball;
 
             UnityMainThread.Enqueue(() =>
-                BoardRenderer.Instance?.RefreshFromData(CurrentPuzzleBoard, CurrentPuzzleStats));
+            {
+                Board3DManager.Instance?.DrawBoard(CurrentPuzzleBoard);
+            });
 
             // Check for puzzle solved after each refresh
             if (CurrentPuzzleStats?.IsSolved == true)

@@ -1,32 +1,12 @@
 /* ─── Game Board Styles ──────────────────────────────────────────────────── */
 
-/* ── Board container ── */
-.board-root {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-    padding: 8px 4px;
-}
-
-/* ── Rows: compact, centered — NOT stretched to fill width ── */
-.board-row {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: center;   /* center the fixed-width tubes */
-    flex-wrap: nowrap;
-    flex-grow: 1;
-    flex-basis: 0;
-    padding: 4px 0;
-}
-
 /* ── HUD bar ── */
 .game-hud {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     padding: 10px 20px;
-    background-color: rgba(255, 255, 255, 0.04);
+    background-color: rgba(0, 0, 0, 0.65); /* Made slightly darker so text pops over 3D background */
     border-bottom-width: 1px;
     border-color: rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
@@ -56,10 +36,11 @@
 .game-controls {
     flex-direction: row;
     padding: 10px 14px;
-    column-gap: 10px;
+    background-color: rgba(0, 0, 0, 0.65); /* Made slightly darker so text pops over 3D background */
     border-top-width: 1px;
     border-color: rgba(255, 255, 255, 0.08);
     flex-shrink: 0;
+    column-gap: 10px;
 }
 
 /* ── Setup sliders ── */
@@ -89,5 +70,6 @@
     border-color: rgba(255, 255, 255, 0.08);
     margin-bottom: 32px;
     flex-wrap: wrap;
-    gap: 6px;
+    row-gap: 6px;
+    column-gap: 6px;
 }

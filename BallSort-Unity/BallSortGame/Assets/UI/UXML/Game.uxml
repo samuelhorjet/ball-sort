@@ -3,15 +3,38 @@
     <Style src="../USS/Common.uss" />
     <Style src="../USS/Game.uss" />
 
-    <ui:VisualElement name="GameScreen" class="screen col">
+    <!--
+        The root screen is transparent and ignores pointer events in the middle
+        so clicks pass through to the 3D physics raycaster.
+    -->
+    <ui:VisualElement name="GameScreen" class="screen col"
+        style="background-color: transparent; picking-mode: Ignore;">
 
-        <!-- HUD top bar -->
-        <ui:VisualElement name="GameHUD" class="game-hud">
-            <ui:Button name="ExitBtn" class="btn-ghost" style="padding: 6px 10px;">
-                <ui:Label text="✕ Exit" style="font-size: 12px; color: rgba(241, 241, 241, 0.25);"/>
-            </ui:Button>
+        <!-- HUD TOP BAR — picking-mode: Position so only real buttons catch clicks -->
+        <ui:VisualElement name="GameHUD" class="game-hud" style="picking-mode: Position;">
 
-            <ui:VisualElement class="row" style="column-column-gap: 28px;">
+            <!-- LEFT: Pause icon + Undo icon -->
+            <ui:VisualElement class="row" style="column-gap: 8px; align-items: center;">
+                <ui:Button name="PauseBtn" style="
+                    width: 36px; height: 36px;
+                    background-color: rgba(255,255,255,0.07);
+                    border-radius: 10px;
+                    border-width: 1px; border-color: rgba(255,255,255,0.12);
+                    padding: 0;">
+                    <ui:Label text="⏸" style="font-size: 16px; -unity-text-align: middle-center; color: rgba(241,241,241,0.60);"/>
+                </ui:Button>
+                <ui:Button name="UndoBtn" style="
+                    width: 36px; height: 36px;
+                    background-color: rgba(255,255,255,0.07);
+                    border-radius: 10px;
+                    border-width: 1px; border-color: rgba(255,255,255,0.12);
+                    padding: 0;">
+                    <ui:Label text="↩" style="font-size: 16px; -unity-text-align: middle-center; color: rgba(241,241,241,0.60);"/>
+                </ui:Button>
+            </ui:VisualElement>
+
+            <!-- CENTRE: Timer / Moves / Undos -->
+            <ui:VisualElement class="row" style="column-gap: 28px;">
                 <ui:VisualElement class="hud-stat">
                     <ui:Label name="TimerLabel" text="00:00" class="hud-value"/>
                     <ui:Label text="TIME" class="hud-label"/>
@@ -22,57 +45,50 @@
                 </ui:VisualElement>
                 <ui:VisualElement class="hud-stat">
                     <ui:Label name="UndosLabel" text="0" class="hud-value"
-                        style="color: rgba(241, 241, 241, 0.25);"/>
+                        style="color: rgba(241,241,241,0.25);"/>
                     <ui:Label text="UNDOS" class="hud-label"/>
                 </ui:VisualElement>
             </ui:VisualElement>
 
-            <ui:VisualElement style="width: 64px;"> <!-- spacer -->
+            <!-- RIGHT: spacer keeps centre row truly centred -->
+            <ui:VisualElement style="width: 80px; align-items: flex-end; justify-content: center;">
                 <ui:Label name="TxIndicator" text="⚡" style="
-                    font-size: 12px; color: rgb(255, 45, 120);
-                    display: none; -unity-text-align: middle-right;
-                "/>
+                    font-size: 12px; color: rgb(255,45,120);
+                    display: none; -unity-text-align: middle-right;"/>
             </ui:VisualElement>
         </ui:VisualElement>
 
-        <!-- Board area (populated entirely by BoardRenderer.cs) -->
-        <ui:VisualElement name="BoardArea" class="board-root flex-1">
-            <ui:VisualElement name="BoardRowTop" class="board-row fill-width"/>
-            <ui:VisualElement name="BoardRowBottom" class="board-row fill-width"/>
+        <!-- Transparent stretch spacer — 3D board lives here, clicks pass through -->
+        <ui:VisualElement style="flex-grow: 1; picking-mode: Ignore;" />
+
+        <!-- PAUSE MODAL -->
+        <ui:VisualElement name="PauseModal" class="modal-backdrop" style="display: none;">
+            <ui:VisualElement class="modal-panel col center" style="row-gap: 0;">
+                <ui:Label text="⏸" style="font-size: 40px; margin-bottom: 12px; -unity-text-align: middle-center;"/>
+                <ui:Label text="Game Paused" class="heading-sm" style="-unity-text-align: middle-center; margin-bottom: 28px;"/>
+                <ui:Button name="ResumeBtn" class="btn-primary" style="width: 100%; margin-bottom: 12px;">
+                    <ui:Label text="▶  Resume" style="-unity-text-align: middle-center; font-size: 15px;"/>
+                </ui:Button>
+                <ui:Button name="AbandonBtn" style="
+                    width: 100%;
+                    background-color: rgba(239,68,68,0.10);
+                    border-width: 1px; border-color: rgba(239,68,68,0.25);
+                    border-radius: 12px; padding: 14px;">
+                    <ui:Label text="🚩  Abandon" style="font-size: 14px; color: rgb(239,68,68); -unity-text-align: middle-center;"/>
+                </ui:Button>
+            </ui:VisualElement>
         </ui:VisualElement>
 
-        <!-- Control bar -->
-        <ui:VisualElement class="game-controls">
-            <ui:Button name="UndoBtn" class="btn-secondary flex-1">
-                <ui:Label text="↩  Undo" style="
-                    font-size: 14px; color: rgba(241, 241, 241, 0.50);
-                    -unity-text-align: middle-center;
-                "/>
-            </ui:Button>
-            <ui:Button name="AbandonBtn" style="
-                flex-grow: 1;
-                background-color: rgba(239,68,68,0.10);
-                border-width: 1px; border-color: rgba(239,68,68,0.25);
-                border-radius: 12px; padding: 14px;
-            ">
-                <ui:Label text="🚩  Abandon" style="
-                    font-size: 14px; color: rgb(239, 68, 68);
-                    -unity-text-align: middle-center;
-                "/>
-            </ui:Button>
-        </ui:VisualElement>
-
-        <!-- Abandon confirm modal (hidden by default) -->
+        <!-- ABANDON CONFIRM MODAL -->
         <ui:VisualElement name="AbandonModal" class="modal-backdrop" style="display: none;">
-            <ui:VisualElement class="modal-panel col center" style="column-column-gap: 0;">
+            <ui:VisualElement class="modal-panel col center" style="row-gap: 0;">
                 <ui:Label text="🚩" style="font-size: 40px; margin-bottom: 12px; -unity-text-align: middle-center;"/>
-                <ui:Label text="Abandon Puzzle?" class="heading-sm"
-                    style="-unity-text-align: middle-center; margin-bottom: 8px;"/>
+                <ui:Label text="Abandon Puzzle?" class="heading-sm" style="-unity-text-align: middle-center; margin-bottom: 8px;"/>
                 <ui:Label text="Your progress will be lost. This cannot be undone."
                     class="body-small" style="-unity-text-align: middle-center; margin-bottom: 28px; white-space: normal;"/>
-                <ui:VisualElement class="row fill-width" style="column-column-gap: 12px;">
+                <ui:VisualElement class="row fill-width" style="column-gap: 12px;">
                     <ui:Button name="AbandonCancelBtn" class="btn-secondary flex-1">
-                        <ui:Label text="Keep Playing" style="-unity-text-align: middle-center; font-size: 13px; color: rgba(241, 241, 241, 0.50);"/>
+                        <ui:Label text="Keep Playing" style="-unity-text-align: middle-center; font-size: 13px; color: rgba(241,241,241,0.50);"/>
                     </ui:Button>
                     <ui:Button name="AbandonConfirmBtn" class="btn-danger flex-1">
                         <ui:Label text="Abandon" style="-unity-text-align: middle-center; font-size: 13px;"/>

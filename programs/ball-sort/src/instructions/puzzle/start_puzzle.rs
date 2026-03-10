@@ -40,7 +40,8 @@ pub fn handle_start_puzzle(ctx: Context<StartPuzzle>) -> Result<()> {
     // 1. Initial setup (sorted perfectly)
     for color in 0..num_colors as usize {
         for slot in 0..balls_per_tube as usize {
-            balls[color * crate::state::puzzle_board::MAX_CAPACITY as usize + slot] = (color + 1) as u8;
+            balls[color * crate::state::puzzle_board::MAX_CAPACITY as usize + slot] =
+                (color + 1) as u8;
         }
         tube_lengths[color] = balls_per_tube;
     }
@@ -59,7 +60,7 @@ pub fn handle_start_puzzle(ctx: Context<StartPuzzle>) -> Result<()> {
     match difficulty {
         0 => {
             // EASY: "Local Shuffle"
-            // Swap balls within a small sliding window. This keeps similar colors 
+            // Swap balls within a small sliding window. This keeps similar colors
             // somewhat clumped together, avoiding extreme fragmentation.
             for i in (1..filled).rev() {
                 let window = 5.min(i as u64); // Only swap with nearby neighbors
@@ -75,27 +76,36 @@ pub fn handle_start_puzzle(ctx: Context<StartPuzzle>) -> Result<()> {
                 balls.swap(get_real_index(i), get_real_index(j));
             }
         }
-        _ => {
-            // HARD: "Adversarial Disorder" 
+        __=> {
+            // HARD: Adversarial Disorder
             // Step A: Pure random shuffle first
             for i in (1..filled).rev() {
                 let j = rng.next_bounded(i as u64 + 1) as usize;
                 balls.swap(get_real_index(i), get_real_index(j));
             }
-            
-            // Step B: Anti-Clumping Pass. Break up vertically stacked balls of the same color.
-            for i in 1..filled {
-                let bpt = balls_per_tube as usize;
-                
-                // i % bpt != 0 ensures we don't compare the top of one tube with the bottom of another
-                if i % bpt != 0 {
-                    let curr = get_real_index(i);
-                    let prev = get_real_index(i - 1);
-                    
-                    if balls[curr] == balls[prev] {
-                        // If they match, banish the top one to a completely random spot on the board
-                        let j = rng.next_bounded(filled as u64) as usize;
-                        balls.swap(curr, get_real_index(j));
+
+            // Step B: Aggressive Anti-Clumping Pass (Run 3 sweeps)
+            let bpt = balls_per_tube as usize;
+            for _ in 0..3 {
+                for i in 1..filled {
+                    // Make sure we only check balls within the same tube
+                    if i % bpt != 0 {
+                        let curr = get_real_index(i);
+                        let prev = get_real_index(i - 1);
+
+                        // If two balls stacked on each other match...
+                        if balls[curr] == balls[prev] {
+                            // Banish the top one to a random spot that DOES NOT match
+                            for _attempt in 0..7 {
+                                let j = rng.next_bounded(filled as u64) as usize;
+                                let target = get_real_index(j);
+                                // Ensure we aren't just creating a new pair!
+                                if balls[target] != balls[curr] {
+                                    balls.swap(curr, target);
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             }

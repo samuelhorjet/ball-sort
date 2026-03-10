@@ -660,7 +660,7 @@ namespace BallSort.UI
     {
         public GameSetupScreen(VisualTreeAsset uxml) : base(uxml) { }
 
-        private int  _tubes = 6, _balls = 4;
+        private int _tubes = 6, _balls = 4;
         private byte _difficulty = 1; // 1=Easy, 2=Medium, 3=Hard
         private const int MIN = 4, MAX = 10;
         private int _step = 0; // 0=tubes, 1=balls, 2=difficulty, 3=preview
@@ -973,17 +973,17 @@ namespace BallSort.UI
             void ShowStep(int s)
             {
                 _step = s;
-                _stepTubes.style.display       = s == 0 ? DisplayStyle.Flex : DisplayStyle.None;
-                _stepBalls.style.display        = s == 1 ? DisplayStyle.Flex : DisplayStyle.None;
-                _stepDifficulty.style.display   = s == 2 ? DisplayStyle.Flex : DisplayStyle.None;
-                _stepPreview.style.display      = s == 3 ? DisplayStyle.Flex : DisplayStyle.None;
+                _stepTubes.style.display = s == 0 ? DisplayStyle.Flex : DisplayStyle.None;
+                _stepBalls.style.display = s == 1 ? DisplayStyle.Flex : DisplayStyle.None;
+                _stepDifficulty.style.display = s == 2 ? DisplayStyle.Flex : DisplayStyle.None;
+                _stepPreview.style.display = s == 3 ? DisplayStyle.Flex : DisplayStyle.None;
                 prevBtn.style.display = s > 0 ? DisplayStyle.Flex : DisplayStyle.None;
                 nextBtn.text = s == 3 ? "🚀  Start Puzzle" : "Next →";
 
                 for (int i2 = 0; i2 < dotEls.Length; i2++)
                     dotEls[i2].style.backgroundColor = new StyleColor(
                         i2 == s ? new Color(1f, 0.18f, 0.47f) :
-                        i2 < s  ? new Color(1f, 0.18f, 0.47f, 0.4f) :
+                        i2 < s ? new Color(1f, 0.18f, 0.47f, 0.4f) :
                                    new Color(1f, 1f, 1f, 0.15f));
 
                 if (s == 3) RefreshPreview();
@@ -996,9 +996,9 @@ namespace BallSort.UI
                 if (_step < 3) { ShowStep(_step + 1); return; }
 
                 // Step 3 = Start Puzzle
-                GameStateManager.Instance.SelectedTubes       = _tubes;
-                GameStateManager.Instance.SelectedBalls        = _balls;
-                GameStateManager.Instance.SelectedDifficulty  = _difficulty;
+                GameStateManager.Instance.SelectedTubes = _tubes;
+                GameStateManager.Instance.SelectedBalls = _balls;
+                GameStateManager.Instance.SelectedDifficulty = _difficulty;
                 nextBtn.SetEnabled(false);
                 nextBtn.text = "Opening session...";
 
@@ -1012,14 +1012,20 @@ namespace BallSort.UI
                 }
                 try
                 {
-                    await PuzzleOrchestrator.Instance.StartNewPuzzleAsync(
-                        (byte)_tubes, (byte)_balls);
+                    nextBtn.SetEnabled(false);
+                    nextBtn.text = "Opening session...";
+
+                    if (PuzzleOrchestrator.Instance != null)
+                    {
+                        await PuzzleOrchestrator.Instance.StartNewPuzzleAsync((byte)_tubes, (byte)_balls);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    GameStateManager.Instance.RaiseError($"Failed to start: {ex.Message}");
+                    Debug.LogError($"[Setup] Failed to start: {ex.Message}");
                     nextBtn.SetEnabled(true);
-                    nextBtn.text = "🚀  Start Puzzle";
+                    nextBtn.text = "🚀 Start Puzzle";
+                    GameStateManager.Instance.RaiseError("Start failed. Check connection.");
                 }
             });
 
@@ -1034,10 +1040,10 @@ namespace BallSort.UI
             _tubes = 6; _balls = 4; _difficulty = 1;
             if (_stepTubes != null)
             {
-                _stepTubes.style.display      = DisplayStyle.Flex;
-                _stepBalls.style.display      = DisplayStyle.None;
+                _stepTubes.style.display = DisplayStyle.Flex;
+                _stepBalls.style.display = DisplayStyle.None;
                 _stepDifficulty.style.display = DisplayStyle.None;
-                _stepPreview.style.display    = DisplayStyle.None;
+                _stepPreview.style.display = DisplayStyle.None;
             }
             RefreshTubesStep();
         }
@@ -1191,7 +1197,7 @@ namespace BallSort.UI
         private void RefreshDifficultyStep()
         {
             if (_diffBtns == null) return;
-            Color pink    = new Color(1f, 0.18f, 0.47f);
+            Color pink = new Color(1f, 0.18f, 0.47f);
             Color pinkDim = new Color(1f, 0.18f, 0.47f, 0.12f);
             for (int di = 0; di < 3; di++)
             {
@@ -1220,7 +1226,7 @@ namespace BallSort.UI
             if (_previewTubesLbl == null) return;
             _previewTubesLbl.text = $"{_tubes} tubes  ({_tubes - 1} filled + 1 empty)";
             _previewBallsLbl.text = $"{_balls} balls per tube";
-            _previewDiffLbl.text  = _difficulty switch { 1 => "🟢 Easy", 2 => "🟡 Medium", _ => "🔴 Hard" };
+            _previewDiffLbl.text = _difficulty switch { 1 => "🟢 Easy", 2 => "🟡 Medium", _ => "🔴 Hard" };
             BuildBoardPreview();
         }
 
@@ -1371,6 +1377,7 @@ namespace BallSort.UI
         private Label _timerLabel, _movesLabel, _undosLabel;
         private System.DateTime _startTime;
         private bool _timerRunning;
+        private bool _paused;
 
         protected override void OnBuild()
         {
@@ -1378,25 +1385,40 @@ namespace BallSort.UI
             _movesLabel = Panel.Q<Label>("MovesLabel");
             _undosLabel = Panel.Q<Label>("UndosLabel");
 
+            // ── Pause button ──────────────────────────────────────────────────
+            Panel.Q<Button>("PauseBtn")?.RegisterCallback<ClickEvent>(_ =>
+            {
+                _paused = true;
+                Panel.Q<VisualElement>("PauseModal").style.display = DisplayStyle.Flex;
+            });
+
+            // ── Resume button (inside Pause modal) ────────────────────────────
+            Panel.Q<Button>("ResumeBtn")?.RegisterCallback<ClickEvent>(_ =>
+            {
+                _paused = false;
+                Panel.Q<VisualElement>("PauseModal").style.display = DisplayStyle.None;
+            });
+
+            // ── Undo button ───────────────────────────────────────────────────
             Panel.Q<Button>("UndoBtn")?.RegisterCallback<ClickEvent>(async _ =>
             {
                 if (PuzzleOrchestrator.Instance.CurrentPuzzleBoard?.HasUndo == true)
                     await PuzzleOrchestrator.Instance.ApplyUndoAsync();
             });
 
-            Panel.Q<Button>("ExitBtn")?.RegisterCallback<ClickEvent>(_ =>
-            {
-                Panel.Q<VisualElement>("AbandonModal").style.display = DisplayStyle.Flex;
-            });
-
+            // ── Abandon (from Pause modal) → opens confirm ────────────────────
             Panel.Q<Button>("AbandonBtn")?.RegisterCallback<ClickEvent>(_ =>
             {
+                Panel.Q<VisualElement>("PauseModal").style.display  = DisplayStyle.None;
                 Panel.Q<VisualElement>("AbandonModal").style.display = DisplayStyle.Flex;
             });
 
+            // ── Abandon confirm modal ─────────────────────────────────────────
             Panel.Q<Button>("AbandonCancelBtn")?.RegisterCallback<ClickEvent>(_ =>
             {
+                // Go back to pause modal rather than straight back to game
                 Panel.Q<VisualElement>("AbandonModal").style.display = DisplayStyle.None;
+                Panel.Q<VisualElement>("PauseModal").style.display   = DisplayStyle.Flex;
             });
 
             Panel.Q<Button>("AbandonConfirmBtn")?.RegisterCallback<ClickEvent>(async _ =>
@@ -1404,43 +1426,42 @@ namespace BallSort.UI
                 Panel.Q<VisualElement>("AbandonModal").style.display = DisplayStyle.None;
                 await PuzzleOrchestrator.Instance.AbandonPuzzleAsync();
             });
-
-            // Initialize BoardRenderer
-            var top = Panel.Q<VisualElement>("BoardRowTop");
-            var bottom = Panel.Q<VisualElement>("BoardRowBottom");
-            BoardRenderer.Instance?.Initialize(top, bottom);
         }
 
         protected override void OnShow()
         {
+            _paused = false;
             _startTime = System.DateTime.UtcNow;
             _timerRunning = true;
-            Panel.schedule.Execute(UpdateHUD).Every(1000);
 
-            // Build board
-            var board = PuzzleOrchestrator.Instance.CurrentPuzzleBoard;
-            var stats = PuzzleOrchestrator.Instance.CurrentPuzzleStats;
-            if (board != null)
-                BoardRenderer.Instance?.BuildBoard(board, stats);
+            // Hide both modals whenever the game screen opens fresh
+            var pauseModal   = Panel.Q<VisualElement>("PauseModal");
+            var abandonModal = Panel.Q<VisualElement>("AbandonModal");
+            if (pauseModal   != null) pauseModal.style.display   = DisplayStyle.None;
+            if (abandonModal != null) abandonModal.style.display = DisplayStyle.None;
+
+            Panel.schedule.Execute(UpdateHUD).Every(1000);
         }
 
         protected override void OnHide()
         {
             _timerRunning = false;
+            _paused = false;
         }
 
         private void UpdateHUD()
         {
-            if (!_timerRunning) return;
+            if (!_timerRunning || _paused) return;
             var elapsed = System.DateTime.UtcNow - _startTime;
             int secs = (int)elapsed.TotalSeconds;
-            _timerLabel.text = $"{secs / 60:D2}:{secs % 60:D2}";
+            if (_timerLabel != null)
+                _timerLabel.text = $"{secs / 60:D2}:{secs % 60:D2}";
 
-            var stats = PuzzleOrchestrator.Instance.CurrentPuzzleStats;
+            var stats = PuzzleOrchestrator.Instance?.CurrentPuzzleStats;
             if (stats != null)
             {
-                _movesLabel.text = stats.MoveCount.ToString();
-                _undosLabel.text = stats.UndoCount.ToString();
+                if (_movesLabel != null) _movesLabel.text = stats.MoveCount.ToString();
+                if (_undosLabel != null) _undosLabel.text = stats.UndoCount.ToString();
             }
         }
     }
