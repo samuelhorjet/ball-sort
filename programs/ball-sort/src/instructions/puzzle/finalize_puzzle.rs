@@ -1,26 +1,31 @@
 use crate::state::{GameConfig, PlayerAuth, PuzzleStats};
 use crate::types::constants::*;
-use crate::types::{GameError, PuzzleStatus};
+use crate::types::{GameError, PuzzleFinalized, PuzzleStatus};
 use anchor_lang::prelude::*;
 
 pub fn handle_finalize_puzzle(ctx: Context<FinalizePuzzle>) -> Result<()> {
-    let auth = &mut ctx.accounts.player_auth;
-
-    require!(
-        auth.active_puzzle_entity.is_some(),
-        GameError::NoPuzzleActive
-    );
-
-    let stats = &ctx.accounts.puzzle_stats;
+    let puzzle_stats_key = ctx.accounts.puzzle_stats.key();
+    let stats = &mut ctx.accounts.puzzle_stats;
 
     require!(stats.is_solved, GameError::PuzzleNotSolved);
 
-    auth.has_active_puzzle = false;
-    auth.active_puzzle_entity = None;
-    auth.active_puzzle_status = PuzzleStatus::Finalized as u8;
+    stats.status = PuzzleStatus::Finalized as u8;
+
+    let auth = &mut ctx.accounts.player_auth;
     auth.total_puzzles_solved = auth.total_puzzles_solved.saturating_add(1);
 
-    msg!("finalize_puzzle: solved, score={}", stats.final_score);
+    let clock = Clock::get()?;
+
+    emit!(PuzzleFinalized {
+        player: auth.wallet,
+        puzzle_board: puzzle_stats_key,
+        puzzle_stats: puzzle_stats_key,
+        move_count: stats.move_count,
+        undo_count: stats.undo_count,
+        difficulty: stats.difficulty,
+        timestamp: clock.unix_timestamp,
+    });
+
     Ok(())
 }
 
@@ -38,6 +43,7 @@ pub struct FinalizePuzzle<'info> {
     pub game_config: Account<'info, GameConfig>,
 
     #[account(
+        mut,
         seeds = [SEED_PUZZLE_STATS, player_auth.key().as_ref(), &player_auth.puzzles_started_nonce.saturating_sub(1).to_le_bytes()],
         bump
     )]

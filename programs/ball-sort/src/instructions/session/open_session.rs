@@ -1,6 +1,6 @@
 use crate::state::PlayerAuth;
 use crate::types::constants::*;
-use crate::types::{GameError, SessionOpened};
+use crate::types::GameError;
 use anchor_lang::prelude::*;
 
 pub fn handle_open_session(
@@ -20,21 +20,13 @@ pub fn handle_open_session(
 
     let auth = &mut ctx.accounts.player_auth;
 
-    if let Some(old_key) = auth.session_key {
-        if clock.unix_timestamp < auth.session_expires_at {
-            msg!("Replacing valid session key {}", old_key);
-        }
+    if let Some(_old_key) = auth.session_key {
+        if clock.unix_timestamp < auth.session_expires_at {}
     }
 
     auth.session_key = Some(session_key);
     auth.session_expires_at = clock.unix_timestamp + expires_in_secs as i64;
 
-    emit!(SessionOpened {
-        player: auth.wallet,
-        session_key,
-        expires_at: auth.session_expires_at,
-        timestamp: clock.unix_timestamp
-    });
     Ok(())
 }
 

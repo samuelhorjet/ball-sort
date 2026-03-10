@@ -74,20 +74,13 @@ pub fn handle_delegate_puzzle(ctx: Context<DelegatePuzzle>) -> Result<()> {
         config_stats
     )?;
 
-    let puzzle_entity = ctx
-        .accounts
-        .player_auth
-        .active_puzzle_entity
-        .unwrap_or_default();
-
     emit!(PuzzleDelegated {
-        puzzle_entity,
+        puzzle_board: ctx.accounts.puzzle_board.key(),
         player: ctx.accounts.player_auth.wallet,
         validator: Some(ctx.accounts.validator.key()),
         timestamp: Clock::get()?.unix_timestamp,
     });
 
-    msg!("puzzle delegated successfully.");
     Ok(())
 }
 
@@ -129,6 +122,5 @@ pub fn handle_undelegate_puzzle(ctx: Context<UndelegatePuzzle>) -> Result<()> {
         &ctx.accounts.magic_program,
     )?;
 
-    msg!("puzzle undelegated successfully");
     Ok(())
 }

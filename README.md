@@ -33,9 +33,9 @@ Written in Rust using the Anchor framework and deployed on Solana.
 Manages:
 
 - Global game configuration and treasury
-- Switchboard VRF integration for provably fair puzzle generation
+- MagicBlock VRF integration for provably fair puzzle generation
 - Tournament lifecycle and parimutuel prize pools
-- PDA ownership of player profiles and tournament entries
+- PDA ownership of tournament entries
 
 ---
 
@@ -105,7 +105,7 @@ create_player_auth()
 open_session(session_key, expires_in_secs)
 ```
 
-Creates the PlayerAuth PDA and player profile.
+Creates the PlayerAuth PDA.
 
 Injects a local Session Key authorized to sign gameplay transactions on the player's behalf, eliminating wallet popups.
 
@@ -120,7 +120,7 @@ consume_randomness(randomness)
 
 Player requests a new puzzle board.
 
-Switchboard VRF securely provides true randomness.
+MagicBlock VRF securely provides true randomness.
 
 The `start_puzzle` instruction shuffles the balls based on the VRF seed.
 
@@ -189,15 +189,68 @@ Adds the player's weight to the tournament's cumulative_weight.
 
 ---
 
-# 5. Weight Calculation Model (Core Math)
+# 5. Scoring Model (Core Math)
 
-Ball Sort uses a Parimutuel Distribution System.
+Ball Sort uses a **dual scoring system**. Every completed puzzle produces two independent numbers that serve completely different purposes:
 
-Rewards are not "winner takes all". They are distributed proportionally based on a calculated weight of your speed and efficiency.
+| | Individual Score | Tournament Weight |
+|---|---|---|
+| **Function** | `compute_score` | `parimutuel_weight` |
+| **Purpose** | Personal performance tracking | Prize pool distribution |
+| **Scope** | Absolute — fixed at solve time | Relative — shifts as others finish |
+| **Stored in** | `puzzle_stats.final_score` | `tournament_entry.weight` |
 
 ---
 
-## 5.1 Weight Formula
+## 5.1 Individual Score (`compute_score`)
+
+Rewards the player for how well they solved the puzzle. The result is personal and does not change based on what other players do.
+
+```rust
+pub fn compute_score(
+    difficulty: u8,
+    move_count: u32,
+    elapsed_secs: u64,
+    undo_count: u32,
+    num_colors: u8,
+    max_capacity: u8,
+) -> u64 {
+    // Difficulty multiplier: Easy = 1x, Medium = 2x, Hard = 3x
+    let base = BASE_POINTS * multiplier;
+
+    // Efficiency: full points if moves <= optimal, scaled down otherwise
+    let optimal = (num_colors * max_capacity) / 2;
+    let efficiency = if actual <= optimal { base } else { base * optimal / actual };
+
+    // Speed bonus: linear bonus for finishing under 300 seconds
+    let speed_bonus = if elapsed_secs >= 300 { 0 } else { base * (300 - elapsed_secs) / 300 };
+
+    // Undo penalty: -50 points per undo used
+    let penalty = 50 * undo_count;
+
+    efficiency + speed_bonus - penalty
+}
+```
+
+### Factors
+
+**Difficulty Multiplier**  
+Hard puzzles yield up to 3x the base points of Easy.
+
+**Move Efficiency**  
+Full points if you solve within the optimal move count `(num_colors × max_capacity) / 2`. Every move beyond optimal proportionally reduces your score.
+
+**Speed Bonus**  
+A linear bonus added for finishing under 300 seconds. No bonus at or beyond 300 seconds.
+
+**Undo Penalty**  
+50 points deducted per undo used. Encourages clean solves.
+
+---
+
+## 5.2 Tournament Parimutuel Weight (`parimutuel_weight`)
+
+Determines your **share of the prize pool** relative to all other tournament completers. This is not a personal score — it is a competitive weight. Your share shifts as other players submit results.
 
 ```rust
 pub fn parimutuel_weight(elapsed_secs: u64, move_count: u32) -> u128 {
@@ -210,16 +263,26 @@ pub fn parimutuel_weight(elapsed_secs: u64, move_count: u32) -> u128 {
 }
 ```
 
+### Prize Distribution Formula
+
+```rust
+player_reward = (player_weight * net_prize_pool) / cumulative_weight
+```
+
 ### Factors
 
-Time Factor  
-Lower `elapsed_secs` results in a higher score.
+**Time Factor**  
+Lower `elapsed_secs` produces a higher weight. Speed is the dominant factor.
 
-Move Factor  
-Lower `move_count` results in a higher score.
+**Move Factor**  
+Lower `move_count` produces a higher weight. Fewer moves means a larger slice.
 
-Scalar  
-Uses a high precision scalar constant to divide the product of time and moves, ensuring granular and competitive weights.
+**Scalar**  
+`PARIMUTUEL_SCALAR = 1_000_000_000_000` preserves precision across the integer division, ensuring small performance differences still produce meaningfully distinct weights.
+
+### Key Distinction from Individual Score
+
+A player can have a high `final_score` (they played efficiently against the optimal) but a low `parimutuel_weight` (other tournament players were simply faster). The two systems are entirely independent and do not reference each other.
 
 ---
 
@@ -270,7 +333,7 @@ Individual puzzle moves (`apply_move`) are executed in a secure enclave. Competi
 
 ### Fairness
 
-Switchboard VRF guarantees every generated board is uniquely and fairly randomized.
+MagicBlock VRF guarantees every generated board is uniquely and fairly randomized.
 
 ### Gasless UX
 

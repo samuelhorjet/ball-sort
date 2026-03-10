@@ -10,14 +10,9 @@ pub fn handle_init_puzzle(
     num_tubes: u8,
     balls_per_tube: u8,
     difficulty: u8,
-    game_mode: u8,
 ) -> Result<()> {
     let clock = Clock::get()?;
     require!(!ctx.accounts.game_config.is_paused, GameError::GamePaused);
-    require!(
-        !ctx.accounts.player_auth.has_active_puzzle,
-        GameError::PuzzleAlreadyActive
-    );
     validate_signer(
         &ctx.accounts.signer.key(),
         &*ctx.accounts.player_auth,
@@ -27,33 +22,34 @@ pub fn handle_init_puzzle(
     let player_auth_key = ctx.accounts.player_auth.key();
     let oracle_queue_key = ctx.accounts.oracle_queue.key();
     let signer_key = ctx.accounts.signer.key();
-
     let puzzle_board_key = ctx.accounts.puzzle_board.key();
     let puzzle_stats_key = ctx.accounts.puzzle_stats.key();
 
-    let vrf_ix = build_vrf_request_ix(signer_key, oracle_queue_key, crate::ID, player_auth_key);
+    let vrf_ix = build_vrf_request_ix(
+        signer_key,
+        oracle_queue_key,
+        player_auth_key,
+        puzzle_stats_key,
+    );
 
     ctx.accounts
         .invoke_signed_vrf(&ctx.accounts.signer.to_account_info(), &vrf_ix)?;
 
-    let auth = &mut ctx.accounts.player_auth;
-    auth.has_active_puzzle = true;
-    auth.active_puzzle_entity = Some(puzzle_board_key);
-    auth.active_puzzle_status = PuzzleStatus::Initialized as u8;
-    auth.vrf_randomness = [0u8; 32];
-    auth.puzzle_num_tubes = num_tubes;
-    auth.puzzle_balls_per_tube = balls_per_tube;
-    auth.puzzle_difficulty = difficulty;
+    let stats = &mut ctx.accounts.puzzle_stats;
+    stats.status = PuzzleStatus::Initialized as u8;
+    stats.num_tubes = num_tubes;
+    stats.balls_per_tube = balls_per_tube;
+    stats.difficulty = difficulty;
+
+    let auth = &ctx.accounts.player_auth;
 
     emit!(PuzzleInitialized {
         player: auth.wallet,
-        puzzle_entity: puzzle_board_key, // Reusing field for backward compat in tests
         puzzle_board: puzzle_board_key,
         puzzle_stats: puzzle_stats_key,
         num_tubes,
         balls_per_tube,
         difficulty,
-        game_mode,
         timestamp: clock.unix_timestamp,
     });
 

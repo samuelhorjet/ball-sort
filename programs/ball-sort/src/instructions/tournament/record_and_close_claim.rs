@@ -1,8 +1,6 @@
 use crate::state::{GameConfig, Tournament, TournamentEntry};
 use crate::types::constants::*;
-use crate::types::{
-    GameError, PrizeClaimed, RefundClaimed, TournamentClosed, TournamentResultRecorded,
-};
+use crate::types::{GameError, PrizeClaimed, TournamentClosed, TournamentResultRecorded};
 use crate::utils::parimutuel_weight;
 use anchor_lang::prelude::*;
 
@@ -125,47 +123,6 @@ pub fn claim_prize_handler(ctx: Context<ClaimPrize>) -> Result<()> {
 
 #[derive(Accounts)]
 pub struct ClaimPrize<'info> {
-    #[account(mut)]
-    pub player: Signer<'info>,
-    #[account(mut, seeds=[SEED_TOURNAMENT, &tournament.tournament_id.to_le_bytes()], bump=tournament.bump)]
-    pub tournament: Account<'info, Tournament>,
-    #[account(mut, seeds=[SEED_TOURNAMENT_ENTRY, tournament.key().as_ref(), player.key().as_ref()], bump=tournament_entry.bump,
-              constraint = tournament_entry.player == player.key() @ GameError::Unauthorized)]
-    pub tournament_entry: Account<'info, TournamentEntry>,
-    pub system_program: Program<'info, System>,
-}
-
-pub fn claim_refund_handler(ctx: Context<ClaimRefund>) -> Result<()> {
-    let clock = Clock::get()?;
-    let t = &mut ctx.accounts.tournament;
-    let entry = &mut ctx.accounts.tournament_entry;
-    require!(t.is_closed, GameError::TournamentNotClosed);
-    require!(!entry.completed, GameError::NotCompleter); // completers use claim_prize
-    require!(!entry.has_claimed, GameError::AlreadyClaimed);
-
-    let (treasury_cut, refund_amount) =
-        Tournament::calculate_fee(entry.entry_deposit, t.treasury_fee_bps);
-    entry.has_claimed = true;
-    if refund_amount > 0 {
-        **ctx
-            .accounts
-            .tournament
-            .to_account_info()
-            .try_borrow_mut_lamports()? -= refund_amount;
-        **ctx.accounts.player.try_borrow_mut_lamports()? += refund_amount;
-    }
-    emit!(RefundClaimed {
-        tournament: ctx.accounts.tournament.key(),
-        player: entry.player,
-        amount: refund_amount,
-        treasury_cut,
-        timestamp: clock.unix_timestamp
-    });
-    Ok(())
-}
-
-#[derive(Accounts)]
-pub struct ClaimRefund<'info> {
     #[account(mut)]
     pub player: Signer<'info>,
     #[account(mut, seeds=[SEED_TOURNAMENT, &tournament.tournament_id.to_le_bytes()], bump=tournament.bump)]

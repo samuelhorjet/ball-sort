@@ -6,10 +6,9 @@ pub enum PuzzleStatus {
     Initialized = 0,
     BoardReady = 1,
     Started = 2,
-    Delegated = 3,
-    Solved = 4,
-    Finalized = 5,
-    Abandoned = 6,
+    Solved = 3,
+    Finalized = 4,
+    Abandoned = 5,
 }
 
 impl PuzzleStatus {
@@ -18,10 +17,9 @@ impl PuzzleStatus {
             0 => Some(Self::Initialized),
             1 => Some(Self::BoardReady),
             2 => Some(Self::Started),
-            3 => Some(Self::Delegated),
-            4 => Some(Self::Solved),
-            5 => Some(Self::Finalized),
-            6 => Some(Self::Abandoned),
+            3 => Some(Self::Solved),
+            4 => Some(Self::Finalized),
+            5 => Some(Self::Abandoned),
             _ => None,
         }
     }

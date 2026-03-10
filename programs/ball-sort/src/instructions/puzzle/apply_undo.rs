@@ -1,6 +1,6 @@
 use crate::state::{GameConfig, PlayerAuth, PuzzleBoard, PuzzleStats};
 use crate::types::constants::*;
-use crate::types::{GameError, PuzzleStatus};
+use crate::types::{GameError, UndoError};
 use crate::utils::validate_signer;
 use anchor_lang::prelude::*;
 
@@ -11,11 +11,6 @@ pub fn handle_apply_undo(ctx: Context<ApplyUndo>) -> Result<()> {
         &*ctx.accounts.player_auth,
         clock.unix_timestamp,
     )?;
-
-    require!(
-        ctx.accounts.player_auth.active_puzzle_status == PuzzleStatus::Started as u8,
-        GameError::InvalidPuzzleStatus
-    );
 
     let board = &mut ctx.accounts.puzzle_board;
     let stats = &mut ctx.accounts.puzzle_stats;
@@ -46,14 +41,6 @@ pub fn handle_apply_undo(ctx: Context<ApplyUndo>) -> Result<()> {
     stats.undo_count = stats.undo_count.saturating_add(1);
 
     Ok(())
-}
-
-#[error_code]
-pub enum UndoError {
-    #[msg("Puzzle is not Active -- cannot undo")]
-    PuzzleNotActive,
-    #[msg("No move available to undo")]
-    NoUndoAvailable,
 }
 
 #[derive(Accounts)]

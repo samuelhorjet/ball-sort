@@ -5,7 +5,6 @@ import {
   Connection,
   PublicKey,
   SystemProgram,
-  TransactionInstruction,
   Transaction,
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
@@ -16,8 +15,6 @@ import * as path from "path";
 
 import {
   DELEGATION_PROGRAM_ID,
-  MAGIC_PROGRAM_ID,
-  MAGIC_CONTEXT_ID,
   PERMISSION_PROGRAM_ID,
   delegationRecordPdaFromDelegatedAccount,
   delegationMetadataPdaFromDelegatedAccount,
@@ -37,9 +34,6 @@ const TEE_VALIDATOR = new PublicKey(
   "FnE6VJT5QNZdedZPnCoLsARgBwoE6DeJNjBs2H1gySXA",
 );
 
-const VRF_PROGRAM = new PublicKey(
-  "Vrf1RNUjXmQGjmQrQLvJHs9SNkvDJEsRVFPkfSQUwGz",
-);
 const VRF_ORACLE_QUEUE = new PublicKey(
   "Cuj97ggrhhidhbu39TijNVqE74xvKJ69gDervRUXAxGh",
 );
@@ -92,10 +86,6 @@ describe("ball-sort devnet E2E test", () => {
     [Buffer.from("player_auth"), player1.publicKey.toBuffer()],
     l1Program.programId,
   );
-  let [playerProfilePda] = PublicKey.findProgramAddressSync(
-    [Buffer.from("player_profile"), player1.publicKey.toBuffer()],
-    l1Program.programId,
-  );
 
   let puzzleBoardPda: PublicKey;
   let puzzleStatsPda: PublicKey;
@@ -107,7 +97,7 @@ describe("ball-sort devnet E2E test", () => {
       if (authInfo) {
         const auth = await l1Program.account.playerAuth.fetch(playerAuthPda);
 
-        if (auth.hasActivePuzzle) {
+        if (auth.sessionKey !== null) {
           console.log("⚠️ Active puzzle detected — clearing old keys...");
 
           const walletDir = path.join(process.cwd(), "tests", "wallets");
@@ -123,10 +113,6 @@ describe("ball-sort devnet E2E test", () => {
             [Buffer.from("player_auth"), player1.publicKey.toBuffer()],
             l1Program.programId,
           );
-          [playerProfilePda] = PublicKey.findProgramAddressSync(
-            [Buffer.from("player_profile"), player1.publicKey.toBuffer()],
-            l1Program.programId,
-          );
         }
       }
     } catch (e: any) {
@@ -134,7 +120,6 @@ describe("ball-sort devnet E2E test", () => {
         "Could not check player auth state (likely layout mismatch). Deleting old wallets and generating new ones. Error:",
         e.message || e,
       );
-      // Layout changed, so fetch fails. Regenerate wallets to start fresh.
       const walletDir = path.join(process.cwd(), "tests", "wallets");
       ["player1.json", "session_key.json"].forEach((file) => {
         const fullPath = path.join(walletDir, file);
@@ -146,10 +131,6 @@ describe("ball-sort devnet E2E test", () => {
 
       [playerAuthPda] = PublicKey.findProgramAddressSync(
         [Buffer.from("player_auth"), player1.publicKey.toBuffer()],
-        l1Program.programId,
-      );
-      [playerProfilePda] = PublicKey.findProgramAddressSync(
-        [Buffer.from("player_profile"), player1.publicKey.toBuffer()],
         l1Program.programId,
       );
     }
@@ -164,10 +145,6 @@ describe("ball-sort devnet E2E test", () => {
       await l1Program.methods
         .initializeGameConfig({
           treasury: admin.publicKey,
-          soarGameAccount: PublicKey.default,
-          worldProgramId: PublicKey.default,
-          vrfProgramId: VRF_PROGRAM,
-          vrfAuthority: admin.publicKey,
           treasuryFeeBps: 500,
         })
         .accountsPartial({ authority: admin.publicKey })
@@ -199,7 +176,6 @@ describe("ball-sort devnet E2E test", () => {
           .accountsPartial({
             player: player1.publicKey,
             playerAuth: playerAuthPda,
-            playerProfile: playerProfilePda,
             gameConfig: gameConfigPda,
             systemProgram: SystemProgram.programId,
           })
@@ -254,7 +230,7 @@ describe("ball-sort devnet E2E test", () => {
     const tx = new Transaction();
     tx.add(
       await l1Program.methods
-        .initPuzzle(4, 4, 1, 0)
+        .initPuzzle(4, 4, 1)
         .accountsPartial({
           signer: sessionKeypair.publicKey,
           playerAuth: playerAuthPda,
@@ -286,17 +262,18 @@ describe("ball-sort devnet E2E test", () => {
 
   it("Wait for VRF auto-callback", async function () {
     this.timeout(10000);
-    console.log("Waiting for VRF devnet auto-callback (up to 60s)...");
+    console.log("Waiting for VRF devnet auto-callback...");
 
     let isReady = false;
+    let statsData: any = null;
     let authData: any = null;
     const TIMEOUT_MS = 5000;
     const start = Date.now();
 
     while (Date.now() - start < TIMEOUT_MS) {
       try {
-        authData = await l1Program.account.playerAuth.fetch(playerAuthPda);
-        if (authData.activePuzzleStatus === 1) {
+        statsData = await l1Program.account.puzzleStats.fetch(puzzleStatsPda);
+        if (statsData.status === 1) {
           isReady = true;
           console.log(
             `VRF fulfilled in ${((Date.now() - start) / 1000).toFixed(1)}s!`,
@@ -304,23 +281,28 @@ describe("ball-sort devnet E2E test", () => {
           break;
         }
       } catch (e) {
-        console.log("Polling for account update...");
+        console.log("Polling for VRF callback...");
       }
       await sleep(3000);
     }
 
-    expect(isReady, "VRF callback timed out after 60s").to.be.true;
-    expect(authData).to.not.be.null;
+    expect(isReady, "VRF callback timed out after 70s").to.be.true;
+    expect(statsData).to.not.be.null;
+
+    authData = await l1Program.account.playerAuth.fetch(playerAuthPda);
 
     console.log("\n=== VRF Randomness Verification ===");
-    console.log("  - active_puzzle_status:", authData.activePuzzleStatus);
+    console.log(
+      "  - puzzle_stats.status (expect 1/BoardReady):",
+      statsData.status,
+    );
     console.log(
       "  - vrf_randomness (hex):",
       Buffer.from(authData.vrfRandomness).toString("hex"),
     );
-    console.log("  - puzzle_num_tubes:", authData.puzzleNumTubes);
-    console.log("  - puzzle_balls_per_tube:", authData.puzzleBallsPerTube);
-    console.log("  - puzzle_difficulty:", authData.puzzleDifficulty);
+    console.log("  - puzzle_num_tubes:", statsData.numTubes);
+    console.log("  - puzzle_balls_per_tube:", statsData.ballsPerTube);
+    console.log("  - puzzle_difficulty:", statsData.difficulty);
 
     const isAllZeros = authData.vrfRandomness.every(
       (byte: number) => byte === 0,
@@ -645,6 +627,7 @@ describe("ball-sort devnet E2E test", () => {
           signer: sessionKeypair.publicKey,
           playerAuth: playerAuthPda,
           gameConfig: gameConfigPda,
+          puzzleStats: puzzleStatsPda,
         })
         .instruction(),
     );
@@ -664,9 +647,8 @@ describe("ball-sort devnet E2E test", () => {
     );
     console.log("  ✅ L1 Abandon signature:", l1Sig);
 
-    const authInfo = await l1Program.account.playerAuth.fetch(playerAuthPda);
-    expect(authInfo.hasActivePuzzle).to.be.false;
-    expect(authInfo.activePuzzleStatus).to.equal(6);
+    const statsInfo = await l1Program.account.puzzleStats.fetch(puzzleStatsPda);
+    expect(statsInfo.status).to.equal(5); // 5 = Abandoned
   });
 
   it("Close Session (L1 - Player1)", async () => {

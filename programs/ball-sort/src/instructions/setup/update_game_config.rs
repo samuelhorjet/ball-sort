@@ -18,30 +18,7 @@ pub fn handle_update_game_config(
             timestamp: ts
         });
     }
-    if let Some(v) = p.soar_game_account {
-        cfg.soar_game_account = v;
-        emit!(GameConfigUpdated {
-            authority: ctx.accounts.authority.key(),
-            field: "soar_game_account".into(),
-            timestamp: ts
-        });
-    }
-    if let Some(v) = p.vrf_program_id {
-        cfg.vrf_program_id = v;
-        emit!(GameConfigUpdated {
-            authority: ctx.accounts.authority.key(),
-            field: "vrf_program_id".into(),
-            timestamp: ts
-        });
-    }
-    if let Some(v) = p.vrf_authority {
-        cfg.vrf_authority = v;
-        emit!(GameConfigUpdated {
-            authority: ctx.accounts.authority.key(),
-            field: "vrf_authority".into(),
-            timestamp: ts
-        });
-    }
+
     if let Some(v) = p.is_paused {
         cfg.is_paused = v;
         emit!(GameConfigUpdated {
@@ -65,9 +42,6 @@ pub fn handle_update_game_config(
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct UpdateGameConfigParams {
     pub treasury: Option<Pubkey>,
-    pub soar_game_account: Option<Pubkey>,
-    pub vrf_program_id: Option<Pubkey>,
-    pub vrf_authority: Option<Pubkey>,
     pub treasury_fee_bps: Option<u16>,
     pub is_paused: Option<bool>,
 }

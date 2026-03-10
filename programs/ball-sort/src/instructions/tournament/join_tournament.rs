@@ -31,10 +31,8 @@ pub fn handle_join_tournament(ctx: Context<JoinTournament>) -> Result<()> {
     let entry = &mut ctx.accounts.tournament_entry;
     entry.tournament = t.key();
     entry.player = ctx.accounts.player.key();
-    entry.puzzle_entity = None;
     entry.entry_deposit = t.entry_fee;
     entry.parimutuel_weight = 0;
-    entry.has_played = false;
     entry.completed = false;
     entry.has_claimed = false;
     entry.bump = ctx.bumps.tournament_entry;

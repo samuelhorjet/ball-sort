@@ -1,4 +1,3 @@
-#![allow(unexpected_cfgs)]
 use anchor_lang::prelude::*;
 use ephemeral_rollups_sdk::anchor::ephemeral;
 pub mod instructions;
@@ -8,7 +7,7 @@ pub mod utils;
 
 use instructions::*;
 
-declare_id!("EJK22df4w6tBXpavJvFMEJS9RRpp73WTK5FpZbCNappN");
+declare_id!("5f83UfHKwf9V9apbsYQGajbgLAtToA1YAimZeSreJz7D");
 
 #[ephemeral]
 #[program]
@@ -36,14 +35,12 @@ pub mod ball_sort {
         num_tubes: u8,
         balls_per_tube: u8,
         difficulty: u8,
-        game_mode: u8,
     ) -> Result<()> {
         instructions::puzzle::init_puzzle::handle_init_puzzle(
             ctx,
             num_tubes,
             balls_per_tube,
             difficulty,
-            game_mode,
         )
     }
     pub fn consume_randomness(ctx: Context<ConsumeRandomness>, randomness: [u8; 32]) -> Result<()> {
@@ -115,8 +112,5 @@ pub mod ball_sort {
     }
     pub fn claim_prize(ctx: Context<ClaimPrize>) -> Result<()> {
         instructions::tournament::record_and_close_claim::claim_prize_handler(ctx)
-    }
-    pub fn claim_refund(ctx: Context<ClaimRefund>) -> Result<()> {
-        instructions::tournament::record_and_close_claim::claim_refund_handler(ctx)
     }
 }

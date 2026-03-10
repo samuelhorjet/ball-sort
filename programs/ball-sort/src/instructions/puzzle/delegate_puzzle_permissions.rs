@@ -131,6 +131,5 @@ pub fn handle_delegate_puzzle_permissions(ctx: Context<DelegatePuzzlePermissions
         .validator(Some(&ctx.accounts.validator))
         .invoke_signed(&[signer_seeds_stats])?;
 
-    msg!("Puzzle permissions delegated safely to TEE");
     Ok(())
 }

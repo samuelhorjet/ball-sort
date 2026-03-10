@@ -113,7 +113,5 @@ pub fn handle_create_puzzle_permissions(ctx: Context<CreatePuzzlePermissions>) -
         puzzle_stats_permission: ctx.accounts.puzzle_stats_permission.key(),
         timestamp: Clock::get()?.unix_timestamp,
     });
-
-    msg!("Puzzle permissions generated successfully and locked to {}", authority);
     Ok(())
 }

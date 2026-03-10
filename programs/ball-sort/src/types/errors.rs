@@ -59,3 +59,25 @@ pub enum GameError {
     #[msg("Session duration out of allowed range (60s - 3600s)")]
     InvalidSessionDuration,
 }
+
+#[error_code]
+pub enum MoveError {
+    #[msg("Puzzle is not Active -- call start_puzzle")]
+    PuzzleNotActive,
+    #[msg("Tube index out of bounds")]
+    InvalidTubeIndex,
+    #[msg("Source and destination tube are the same")]
+    SameTube,
+    #[msg("Source tube is empty")]
+    SourceTubeEmpty,
+    #[msg("Destination tube is full")]
+    DestinationTubeFull,
+}
+
+#[error_code]
+pub enum UndoError {
+    #[msg("Puzzle is not Active -- cannot undo")]
+    PuzzleNotActive,
+    #[msg("No move available to undo")]
+    NoUndoAvailable,
+}
