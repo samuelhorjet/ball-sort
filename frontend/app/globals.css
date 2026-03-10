@@ -1,0 +1,282 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: var(--font-syne);
+  --font-body: var(--font-outfit);
+
+  --color-brand: #ff2d8b;
+  --color-brand-light: #ff79c6;
+  --color-brand-dark: #c4106a;
+  --color-brand-dim: rgba(255, 45, 139, 0.12);
+  --color-surface: #07070f;
+  --color-raised: #0d0d1e;
+  --color-elevated: #12122a;
+  --color-border: #1c1c38;
+  --color-muted: #666688;
+  --color-text: #f0f0fa;
+  --color-ball-pink: #ff2d8b;
+  --color-ball-blue: #4d9fff;
+  --color-ball-green: #3dd9a0;
+  --color-ball-yellow: #ffd93d;
+  --color-ball-purple: #b44dff;
+  --color-ball-coral: #ff6b6b;
+  --color-ball-teal: #2dd4bf;
+  --color-ball-orange: #ff9f43;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #07070f;
+  color: #f0f0fa;
+  font-family: var(--font-outfit), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ─── Floating ball animations ─────────────────────────── */
+@keyframes floatA {
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  25% {
+    transform: translate(22px, -44px) scale(1.06);
+  }
+  50% {
+    transform: translate(-18px, -22px) scale(0.94);
+  }
+  75% {
+    transform: translate(12px, -52px) scale(1.03);
+  }
+}
+
+@keyframes floatB {
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  25% {
+    transform: translate(-32px, 24px) scale(1.08);
+  }
+  50% {
+    transform: translate(22px, 38px) scale(0.92);
+  }
+  75% {
+    transform: translate(-12px, 18px) scale(1.04);
+  }
+}
+
+@keyframes floatC {
+  0%,
+  100% {
+    transform: translate(0px, 0px) rotate(0deg);
+  }
+  33% {
+    transform: translate(18px, -28px) rotate(130deg);
+  }
+  66% {
+    transform: translate(-22px, 12px) rotate(260deg);
+  }
+}
+
+@keyframes floatD {
+  0%,
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  40% {
+    transform: translate(28px, -35px) scale(1.1);
+  }
+  80% {
+    transform: translate(-15px, -50px) scale(0.9);
+  }
+}
+
+/* ─── Text / fade animations ────────────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ─── Glow / shimmer ────────────────────────────────────── */
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 24px rgba(255, 45, 139, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 48px rgba(255, 45, 139, 0.65);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ─── Utility classes ───────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #ff2d8b 0%, #ff79c6 50%, #b44dff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #ff2d8b 0%,
+    #ff79c6 25%,
+    #ffffff 50%,
+    #ff79c6 75%,
+    #ff2d8b 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+.card-glow {
+  transition: all 0.3s ease;
+}
+.card-glow:hover {
+  border-color: rgba(255, 45, 139, 0.4) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 45, 139, 0.15),
+    0 8px 32px rgba(255, 45, 139, 0.12);
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ff2d8b, #c4106a);
+  color: white;
+  font-family: var(--font-syne), sans-serif;
+  font-weight: 600;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #ff4da0, #d91577);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 45, 139, 0.5);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #f0f0fa;
+  font-family: var(--font-syne), sans-serif;
+  font-weight: 600;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.75rem;
+  border: 1.5px solid #1c1c38;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+}
+.btn-secondary:hover {
+  border-color: rgba(255, 45, 139, 0.5);
+  color: #ff79c6;
+  background: rgba(255, 45, 139, 0.06);
+  transform: translateY(-2px);
+}
+
+.glass-card {
+  background: rgba(13, 13, 30, 0.8);
+  border: 1px solid #1c1c38;
+  border-radius: 1.25rem;
+  backdrop-filter: blur(12px);
+}
+
+/* ─── Custom scrollbar ──────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #07070f;
+}
+::-webkit-scrollbar-thumb {
+  background: #1c1c38;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ff2d8b;
+}
+
+/* ─── Noise texture overlay ─────────────────────────────── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
