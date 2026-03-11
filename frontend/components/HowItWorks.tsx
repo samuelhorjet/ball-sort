@@ -108,7 +108,7 @@ export default function HowItWorks() {
           className="hiw-grid"
         >
           {/* Steps */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem", overflow: "hidden" }}>
             {STEPS.map((step, idx) => (
               <div
                 key={step.num}
@@ -155,7 +155,7 @@ export default function HowItWorks() {
                 </div>
 
                 {/* Text */}
-                <div style={{ paddingTop: "0.1rem" }}>
+                <div style={{ paddingTop: "0.1rem", minWidth: 0, flex: 1 }}>
                   <div
                     style={{
                       fontFamily: "var(--font-syne)",
@@ -188,6 +188,8 @@ export default function HowItWorks() {
                       fontSize: "0.85rem",
                       color: "#666688",
                       lineHeight: 1.6,
+                      wordBreak: "break-word" as const,
+                      overflowWrap: "break-word" as const,
                     }}
                   >
                     {step.desc}
@@ -208,11 +210,13 @@ export default function HowItWorks() {
 
           {/* Live puzzle demo */}
           <div
+            className="hiw-demo-col"
             style={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               gap: "1rem",
+              overflow: "hidden",
             }}
           >
             {/* Demo label */}
@@ -290,6 +294,14 @@ export default function HowItWorks() {
           .hiw-grid {
             grid-template-columns: 1fr !important;
             gap: 3rem !important;
+          }
+          .hiw-demo-col > div {
+            max-width: 100% !important;
+          }
+        }
+        @media (max-width: 400px) {
+          .hiw-grid {
+            gap: 2rem !important;
           }
         }
       `}</style>

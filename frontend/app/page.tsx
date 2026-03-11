@@ -887,23 +887,24 @@ function Hero() {
           </p>
 
           <div
+            className="hero-buttons"
             style={{
               display: "flex",
-              gap: "0.5rem",
-              flexWrap: "wrap",
+              gap: "0.1rem",
+              flexWrap: "nowrap",
               animation: "fadeInUp 0.7s ease 0.3s both",
             }}
           >
             <a
               href="#"
-              className="btn-primary"
+              className="btn-primary hero-btn"
               style={{ fontSize: "1rem", padding: "0.85rem 2rem" }}
             >
               Play Now ↗
             </a>
             <Link
               href="/dashboard"
-              className="btn-secondary"
+              className="btn-secondary hero-btn"
               style={{ fontSize: "1rem", padding: "0.85rem 2rem" }}
             >
               My Dashboard
@@ -1041,6 +1042,9 @@ function Hero() {
           .hero-layout { grid-template-columns: 1fr !important; min-height: auto !important; padding-top: 3rem !important; padding-bottom: 4rem !important; }
           .hero-layout > div:last-child { display: none !important; }
           .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 400px) {
+          .hero-btn { font-size: 0.82rem !important; padding: 0.7rem 1.2rem !important; }
         }
       `}</style>
     </section>
@@ -1499,9 +1503,10 @@ function TournamentPreview() {
             </span>
           </div>
           <h2
+            className="tournament-heading"
             style={{
               fontFamily: "var(--font-syne)",
-              fontSize: "clamp(1.35rem, 3.5vw, 2.5rem)",
+              fontSize: "clamp(1.1rem, 3.5vw, 2.5rem)",
               fontWeight: 800,
               color: "#f0f0fa",
               letterSpacing: "-0.03em",
@@ -1600,6 +1605,7 @@ function TournamentPreview() {
       <style>{`
         @media (max-width: 900px) { .tournament-grid { grid-template-columns: repeat(2, 1fr) !important; } }
         @media (max-width: 600px) { .tournament-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 400px) { .tournament-heading { font-size: 1rem !important; } }
       `}</style>
     </section>
   );
