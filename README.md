@@ -19,8 +19,8 @@ https://github.com/samuelhorjet/ball-sort/tree/main/frontend
 Smart Contract Repo  
 https://github.com/samuelhorjet/ball-sort
 
-Demo Video  
-https://youtu.be/placeholder
+Live Demo  
+https://ball-sort.netlify.app/
 
 ---
 
