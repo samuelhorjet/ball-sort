@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const FEATURES = [
   {
@@ -242,16 +242,373 @@ const BALL_COLORS = [
   "#ff6b6b",
 ];
 
+/* ─── Diamond Logo ─────────────────────────────────────── */
+function DiamondLogo({ size = 45 }: { size?: number }) {
+  const ballSize = Math.round(size * 0.244);
+  const centerSize = Math.round(size * 0.356);
+  const positions = [
+    { gridArea: "1 / 2" },
+    { gridArea: "2 / 1" },
+    { gridArea: "2 / 3" },
+    { gridArea: "3 / 2" },
+  ];
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gridTemplateRows: "repeat(3, 1fr)",
+        gap: "2px",
+        alignItems: "center",
+        justifyItems: "center",
+        width: `${size}px`,
+        height: `${size}px`,
+        position: "relative",
+      }}
+    >
+      {BALL_COLORS.slice(0, 4).map((c, i) => (
+        <div
+          key={i}
+          style={{
+            ...positions[i],
+            width: `${ballSize}px`,
+            height: `${ballSize}px`,
+            borderRadius: "50%",
+            background: `radial-gradient(circle at 35% 35%, ${c}ee, ${c}88)`,
+            boxShadow: `0 0 8px ${c}aa`,
+          }}
+        />
+      ))}
+      <div
+        style={{
+          gridArea: "2 / 2",
+          width: `${centerSize}px`,
+          height: `${centerSize}px`,
+          borderRadius: "50%",
+          background: `radial-gradient(circle at 35% 35%, #ffffff, ${
+            BALL_COLORS[4] || "#fff"
+          }dd)`,
+          boxShadow: `0 0 12px white`,
+          zIndex: 2,
+        }}
+      />
+    </div>
+  );
+}
+
+/* ─── useInView scroll hook ────────────────────────────── */
+function useInView(options: IntersectionObserverInit = {}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  const optionsRef = useRef(options);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.12, ...optionsRef.current },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return { ref, inView };
+}
+
+/* ─── Preloader ────────────────────────────────────────── */
+function Preloader({ onDone }: { onDone: () => void }) {
+  const [phase, setPhase] = useState(0);
+  const [isOnline, setIsOnline] = useState(true);
+  const onDoneRef = useRef(onDone);
+  useEffect(() => { onDoneRef.current = onDone; }, [onDone]);
+
+  // Network tracking
+  useEffect(() => {
+    const check = () => setIsOnline(navigator.onLine);
+    check();
+    window.addEventListener("online", check);
+    window.addEventListener("offline", check);
+
+    // Also try a small fetch ping as a secondary check
+    const ping = () => {
+      fetch("/", { method: "HEAD", cache: "no-store" })
+        .then(() => setIsOnline(true))
+        .catch(() => setIsOnline(false));
+    };
+    const interval = setInterval(ping, 4000);
+
+    return () => {
+      window.removeEventListener("online", check);
+      window.removeEventListener("offline", check);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Animation timeline — only completes if online
+  useEffect(() => {
+    if (!isOnline) return;
+
+    const timers = [
+      setTimeout(() => setPhase(1), 500),   // start wave
+      setTimeout(() => setPhase(2), 1800),   // spin to diamond
+      setTimeout(() => setPhase(3), 2800),   // center ball glow
+      setTimeout(() => setPhase(4), 3800),   // fade out
+      setTimeout(() => onDoneRef.current(), 4500),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, [isOnline]);
+
+  const ballColors = ["#ff2d8b", "#4d9fff", "#3dd9a0", "#ffd93d"];
+
+  // -- Positions --
+  // Logo area: 80×80, center = 40,40 (tight like DiamondLogo)
+  const area = 80;
+  const cx = area / 2; // 40
+  const cy = area / 2; // 40
+  const outerBall = 16;
+  const centerBall = 22; // ~1.4x bigger like logo
+  const spread = 20; // distance from center for diamond points
+
+  // Phase 0: horizontal row, centered
+  const horizPositions = [
+    { x: cx - 30, y: cy },
+    { x: cx - 10, y: cy },
+    { x: cx + 10, y: cy },
+    { x: cx + 30, y: cy },
+  ];
+
+  // Phase 2+: diamond (top, left, right, bottom)
+  const diamondPositions = [
+    { x: cx,          y: cy - spread },
+    { x: cx - spread, y: cy },
+    { x: cx + spread, y: cy },
+    { x: cx,          y: cy + spread },
+  ];
+
+  const getPos = (i: number) => {
+    if (phase < 2) return horizPositions[i];
+    return diamondPositions[i];
+  };
+
+  return (
+    <>
+      <style>{`
+        @keyframes preloaderFadeOut {
+          from { opacity: 1; }
+          to { opacity: 0; pointer-events: none; }
+        }
+        @keyframes preloaderBallIn {
+          from { opacity: 0; transform: scale(0); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes waveBounce0 {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-18px); }
+        }
+        @keyframes waveBounce1 {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(18px); }
+        }
+        @keyframes waveBounce2 {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-18px); }
+        }
+        @keyframes waveBounce3 {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(18px); }
+        }
+        @keyframes spinToDiamond {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes centerBallIn {
+          from { opacity: 0; transform: scale(0); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes centerGlowPulse {
+          0%, 100% {
+            box-shadow: 0 0 12px #ffffffaa, 0 0 24px rgba(255,45,139,0.5), 0 0 36px rgba(180,77,255,0.3);
+          }
+          50% {
+            box-shadow: 0 0 24px #ffffffff, 0 0 48px rgba(255,45,139,0.8), 0 0 72px rgba(180,77,255,0.5);
+          }
+        }
+        @keyframes logoScaleIn {
+          from { transform: scale(0.85); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        @keyframes offlinePulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+        .preloader-ball-anim {
+          position: absolute;
+          border-radius: 50%;
+          transition: left 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+                      top 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+      `}</style>
+
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 9999,
+          background: "#07070f",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "1.5rem",
+          animation:
+            phase === 4 ? "preloaderFadeOut 0.7s ease 0s forwards" : "none",
+        }}
+      >
+        {/* Ambient glow */}
+        <div
+          style={{
+            position: "absolute",
+            width: "260px",
+            height: "260px",
+            borderRadius: "50%",
+            background:
+              "radial-gradient(ellipse, rgba(255,45,139,0.06) 0%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
+
+        {/* Logo animation area */}
+        <div
+          style={{
+            position: "relative",
+            width: `${area}px`,
+            height: `${area}px`,
+            animation: phase === 2 ? "spinToDiamond 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards" : "none",
+          }}
+        >
+          {/* 4 colored balls */}
+          {ballColors.map((c, i) => {
+            const pos = getPos(i);
+            return (
+              <div
+                key={i}
+                className="preloader-ball-anim"
+                style={{
+                  width: `${outerBall}px`,
+                  height: `${outerBall}px`,
+                  background: `radial-gradient(circle at 35% 35%, ${c}ff, ${c}88)`,
+                  boxShadow: `0 0 10px ${c}aa, 0 0 20px ${c}33`,
+                  left: `${pos.x - outerBall / 2}px`,
+                  top: `${pos.y - outerBall / 2}px`,
+                  animation:
+                    phase === 0
+                      ? `preloaderBallIn 0.3s ease ${i * 0.1}s both`
+                      : phase === 1
+                      ? `waveBounce${i} 0.6s cubic-bezier(0.36, 0, 0.66, 1) ${i * 0.12}s infinite`
+                      : "none",
+                }}
+              />
+            );
+          })}
+
+          {/* White center ball — appears in phase 3 */}
+          {phase >= 3 && (
+            <div
+              style={{
+                position: "absolute",
+                width: `${centerBall}px`,
+                height: `${centerBall}px`,
+                borderRadius: "50%",
+                background:
+                  "radial-gradient(circle at 35% 35%, #ffffff, #e0d0ffdd)",
+                left: `${cx - centerBall / 2}px`,
+                top: `${cy - centerBall / 2}px`,
+                zIndex: 2,
+                animation:
+                  "centerBallIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both, centerGlowPulse 1.8s ease-in-out 0.35s infinite",
+              }}
+            />
+          )}
+        </div>
+
+        {/* Network status indicator */}
+        {!isOnline && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              animation: "offlinePulse 2s ease-in-out infinite",
+            }}
+          >
+            <div
+              style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                background: "#ff6b6b",
+                boxShadow: "0 0 8px #ff6b6b88",
+              }}
+            />
+            <span
+              style={{
+                fontFamily: "var(--font-outfit)",
+                fontSize: "0.78rem",
+                color: "#ff6b6b",
+                fontWeight: 500,
+                letterSpacing: "0.04em",
+              }}
+            >
+              Waiting for connection…
+            </span>
+          </div>
+        )}
+
+        {/* Loading dots — show during wave phase */}
+        {phase < 3 && isOnline && (
+          <div style={{ display: "flex", gap: "6px" }}>
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                style={{
+                  width: "4px",
+                  height: "4px",
+                  borderRadius: "50%",
+                  background: "#ff2d8b",
+                  opacity: 0.5,
+                  animation: `pulseGlow 1s ease-in-out ${i * 0.15}s infinite`,
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
 /* ─── Navbar ──────────────────────────────────────────── */
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [walletConnected] = useState(false); // swap to true once wallet is linked
+  const [walletConnected] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const NAV_ITEMS = [
     { label: "Features", href: "#features" },
     { label: "How It Works", href: "#how-it-works" },
     { label: "Tournaments", href: "#tournaments" },
-    // Dashboard only appears after wallet is connected:
     ...(walletConnected ? [{ label: "Dashboard", href: "/dashboard" }] : []),
   ];
 
@@ -268,10 +625,11 @@ function Navbar() {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        background: "rgba(7,7,26,0.85)",
+        background: scrolled ? "rgba(7,7,26,0.95)" : "rgba(7,7,26,0.85)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         borderBottom: "1px solid rgba(255,255,255,0.07)",
+        transition: "background 0.3s ease",
       }}
     >
       {/* Logo */}
@@ -284,58 +642,7 @@ function Navbar() {
           textDecoration: "none",
         }}
       >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gridTemplateRows: "repeat(3, 1fr)",
-            gap: "2px",
-            alignItems: "center",
-            justifyItems: "center",
-            width: "45px",
-            height: "45px",
-            position: "relative",
-          }}
-        >
-          {/* The 4 Outer Points */}
-          {BALL_COLORS.slice(0, 4).map((c, i) => {
-            const positions = [
-              { gridArea: "1 / 2" }, // Top (Row 1, Col 2)
-              { gridArea: "2 / 1" }, // Left (Row 2, Col 1)
-              { gridArea: "2 / 3" }, // Right (Row 2, Col 3)
-              { gridArea: "3 / 2" }, // Bottom (Row 3, Col 2)
-            ];
-
-            return (
-              <div
-                key={i}
-                style={{
-                  ...positions[i],
-                  width: "11px",
-                  height: "11px",
-                  borderRadius: "50%",
-                  background: `radial-gradient(circle at 35% 35%, ${c}ee, ${c}88)`,
-                  boxShadow: `0 0 8px ${c}aa`,
-                }}
-              />
-            );
-          })}
-
-          {/* The Center Core (Using index 4 or a bright white/yellow) */}
-          <div
-            style={{
-              gridArea: "2 / 2", // Dead Center
-              width: "16px",
-              height: "16px",
-              borderRadius: "50%",
-              background: `radial-gradient(circle at 35% 35%, #ffffff, ${
-                BALL_COLORS[4] || "#fff"
-              }dd)`,
-              boxShadow: `0 0 12px white`,
-              zIndex: 2,
-            }}
-          />
-        </div>
+        <DiamondLogo size={45} />
         <span
           style={{
             fontFamily: "var(--font-syne)",
@@ -480,7 +787,6 @@ function Hero() {
         overflow: "hidden",
       }}
     >
-      {/* Radial gradient background */}
       <div
         style={{
           position: "absolute",
@@ -490,8 +796,6 @@ function Hero() {
           pointerEvents: "none",
         }}
       />
-
-      {/* Grid pattern */}
       <div
         style={{
           position: "absolute",
@@ -505,7 +809,6 @@ function Hero() {
         }}
       />
 
-      {/* Floating balls — right side of viewport */}
       {BALLS.map((ball, i) => (
         <div
           key={i}
@@ -529,7 +832,6 @@ function Hero() {
         />
       ))}
 
-      {/* ── Two-column hero layout ── */}
       <div
         className="hero-layout"
         style={{
@@ -546,7 +848,6 @@ function Hero() {
           minHeight: "calc(100vh - 68px)",
         }}
       >
-        {/* LEFT — text content */}
         <div
           style={{
             display: "flex",
@@ -554,7 +855,6 @@ function Hero() {
             alignItems: "flex-start",
           }}
         >
-          {/* Badge */}
           <div
             style={{
               display: "inline-flex",
@@ -582,7 +882,6 @@ function Hero() {
             </span>
           </div>
 
-          {/* Headline */}
           <h1
             style={{
               fontFamily: "var(--font-syne)",
@@ -601,7 +900,6 @@ function Hero() {
             </span>
           </h1>
 
-          {/* Subtitle */}
           <p
             style={{
               fontFamily: "var(--font-outfit)",
@@ -618,7 +916,6 @@ function Hero() {
             fast with ephemeral rollups, and loaded with real prize pools.
           </p>
 
-          {/* CTA Buttons */}
           <div
             style={{
               display: "flex",
@@ -643,7 +940,6 @@ function Hero() {
             </Link>
           </div>
 
-          {/* Trust badges */}
           <div
             style={{
               display: "flex",
@@ -681,7 +977,6 @@ function Hero() {
             )}
           </div>
 
-          {/* Stats bar — under text content */}
           <div
             style={{
               marginTop: "3rem",
@@ -732,7 +1027,6 @@ function Hero() {
           </div>
         </div>
 
-        {/* RIGHT — empty; balls float here via absolute positioning */}
         <div aria-hidden="true" />
       </div>
 
@@ -771,15 +1065,9 @@ function Hero() {
         />
       </div>
 
-      {/* Responsive: stack on mobile */}
       <style>{`
         @media (max-width: 768px) {
-          .hero-layout {
-            grid-template-columns: 1fr !important;
-            min-height: auto !important;
-            padding-top: 3rem !important;
-            padding-bottom: 4rem !important;
-          }
+          .hero-layout { grid-template-columns: 1fr !important; min-height: auto !important; padding-top: 3rem !important; padding-bottom: 4rem !important; }
           .hero-layout > div:last-child { display: none !important; }
         }
       `}</style>
@@ -787,15 +1075,141 @@ function Hero() {
   );
 }
 
+/* ─── Feature Card (extracted for hooks) ──────────────── */
+function FeatureCard({ f, idx, dir }: { f: typeof FEATURES[number]; idx: number; dir: string }) {
+  const { ref, inView } = useInView();
+  return (
+    <div
+      key={f.title}
+      ref={ref}
+      className={`card-glow ${inView ? `anim-${dir}` : "anim-hidden"}`}
+      style={{
+        background: "#0d0d1e",
+        border: "1px solid #1c1c38",
+        borderRadius: "1.25rem",
+        padding: "1.75rem",
+        position: "relative",
+        overflow: "hidden",
+        animationDelay: inView ? `${idx * 0.1}s` : "0s",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: "1.75rem",
+          right: "1.75rem",
+          height: "2px",
+          background: `linear-gradient(90deg, ${f.accent}88, transparent)`,
+        }}
+      />
+      <div
+        style={{
+          display: "inline-block",
+          background: `${f.accent}15`,
+          border: `1px solid ${f.accent}30`,
+          borderRadius: "0.5rem",
+          padding: "0.2rem 0.6rem",
+          marginBottom: "1.25rem",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "var(--font-syne)",
+            fontSize: "0.7rem",
+            fontWeight: 600,
+            color: f.accent,
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+          }}
+        >
+          {f.tag}
+        </span>
+      </div>
+      <div
+        style={{
+          width: "52px",
+          height: "52px",
+          borderRadius: "14px",
+          background: `${f.accent}18`,
+          border: `1px solid ${f.accent}25`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "1.6rem",
+          marginBottom: "1.25rem",
+        }}
+      >
+        {f.icon}
+      </div>
+      <h3
+        style={{
+          fontFamily: "var(--font-syne)",
+          fontSize: "1.1rem",
+          fontWeight: 700,
+          color: "#f0f0fa",
+          marginBottom: "0.6rem",
+          letterSpacing: "-0.01em",
+        }}
+      >
+        {f.title}
+      </h3>
+      <p
+        style={{
+          fontFamily: "var(--font-outfit)",
+          fontSize: "0.85rem",
+          color: "#777799",
+          lineHeight: 1.65,
+        }}
+      >
+        {f.desc}
+      </p>
+    </div>
+  );
+}
+
 /* ─── Features ────────────────────────────────────────── */
 function Features() {
+  const { ref: headerRef, inView: headerInView } = useInView();
+
+  const slideDirections = [
+    "slideInLeft",
+    "slideInBottom",
+    "slideInBottom",
+    "slideInRight",
+  ];
+
   return (
     <section
       id="features"
       style={{ padding: "6rem 1.5rem", maxWidth: "1200px", margin: "0 auto" }}
     >
+      <style>{`
+        @keyframes slideInLeft {
+          from { opacity: 0; transform: translateX(-48px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+          from { opacity: 0; transform: translateX(48px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInBottom {
+          from { opacity: 0; transform: translateY(48px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .anim-hidden { opacity: 0; }
+        .anim-slideInLeft { animation: slideInLeft 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        .anim-slideInRight { animation: slideInRight 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        .anim-slideInBottom { animation: slideInBottom 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+        .anim-fadeInUp { animation: fadeInUp 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
+      `}</style>
+
       {/* Section header */}
-      <div style={{ textAlign: "center", marginBottom: "3.5rem" }}>
+      <div
+        ref={headerRef}
+        className={headerInView ? "anim-fadeInUp" : "anim-hidden"}
+        style={{ textAlign: "center", marginBottom: "3.5rem" }}
+      >
         <div
           style={{
             display: "inline-block",
@@ -848,7 +1262,7 @@ function Features() {
         </p>
       </div>
 
-      {/* 4-column features grid — all boxes in one row on desktop */}
+      {/* 4-column features grid */}
       <div
         className="features-grid"
         style={{
@@ -857,97 +1271,8 @@ function Features() {
           gap: "1.25rem",
         }}
       >
-        {FEATURES.map((f) => (
-          <div
-            key={f.title}
-            className="card-glow"
-            style={{
-              background: "#0d0d1e",
-              border: "1px solid #1c1c38",
-              borderRadius: "1.25rem",
-              padding: "1.75rem",
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
-            {/* Top accent line */}
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: "1.75rem",
-                right: "1.75rem",
-                height: "2px",
-                background: `linear-gradient(90deg, ${f.accent}88, transparent)`,
-              }}
-            />
-
-            {/* Tag */}
-            <div
-              style={{
-                display: "inline-block",
-                background: `${f.accent}15`,
-                border: `1px solid ${f.accent}30`,
-                borderRadius: "0.5rem",
-                padding: "0.2rem 0.6rem",
-                marginBottom: "1.25rem",
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: "var(--font-syne)",
-                  fontSize: "0.7rem",
-                  fontWeight: 600,
-                  color: f.accent,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                }}
-              >
-                {f.tag}
-              </span>
-            </div>
-
-            {/* Icon */}
-            <div
-              style={{
-                width: "52px",
-                height: "52px",
-                borderRadius: "14px",
-                background: `${f.accent}18`,
-                border: `1px solid ${f.accent}25`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "1.6rem",
-                marginBottom: "1.25rem",
-              }}
-            >
-              {f.icon}
-            </div>
-
-            <h3
-              style={{
-                fontFamily: "var(--font-syne)",
-                fontSize: "1.1rem",
-                fontWeight: 700,
-                color: "#f0f0fa",
-                marginBottom: "0.6rem",
-                letterSpacing: "-0.01em",
-              }}
-            >
-              {f.title}
-            </h3>
-            <p
-              style={{
-                fontFamily: "var(--font-outfit)",
-                fontSize: "0.85rem",
-                color: "#777799",
-                lineHeight: 1.65,
-              }}
-            >
-              {f.desc}
-            </p>
-          </div>
+        {FEATURES.map((f, idx) => (
+          <FeatureCard key={f.title} f={f} idx={idx} dir={slideDirections[idx]} />
         ))}
       </div>
 
@@ -959,8 +1284,105 @@ function Features() {
   );
 }
 
+/* ─── Step Card (extracted for hooks) ─────────────────── */
+function StepCard({ step, idx }: { step: typeof STEPS[number]; idx: number }) {
+  const { ref, inView } = useInView();
+  return (
+    <div
+      ref={ref}
+      className={inView ? "anim-slideInBottom" : "anim-hidden"}
+      style={{
+        position: "relative",
+        textAlign: "center",
+        padding: "2rem 1.5rem",
+        animationDelay: inView ? `${idx * 0.15}s` : "0s",
+      }}
+    >
+      {idx < STEPS.length - 1 && (
+        <div
+          style={{
+            position: "absolute",
+            top: "3.5rem",
+            right: "-0.75rem",
+            width: "1.5rem",
+            height: "1px",
+            background:
+              "linear-gradient(90deg, #1c1c38, rgba(28,28,56,0))",
+            zIndex: -1,
+          }}
+        />
+      )}
+      <div
+        style={{
+          fontFamily: "var(--font-syne)",
+          fontSize: "0.7rem",
+          fontWeight: 700,
+          color: step.color,
+          letterSpacing: "0.15em",
+          textTransform: "uppercase",
+          marginBottom: "1.25rem",
+          opacity: 0.7,
+        }}
+      >
+        Step {step.num}
+      </div>
+      <div
+        style={{
+          width: "72px",
+          height: "72px",
+          borderRadius: "50%",
+          background: `radial-gradient(circle at 35% 35%, ${step.color}33, ${step.color}11)`,
+          border: `2px solid ${step.color}35`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "2rem",
+          margin: "0 auto 1.25rem",
+          boxShadow: `0 0 24px ${step.color}25`,
+          position: "relative",
+        }}
+      >
+        {step.icon}
+        <div
+          style={{
+            position: "absolute",
+            inset: "-6px",
+            borderRadius: "50%",
+            border: `1px solid ${step.color}18`,
+          }}
+        />
+      </div>
+      <h3
+        style={{
+          fontFamily: "var(--font-syne)",
+          fontSize: "1.05rem",
+          fontWeight: 700,
+          color: "#f0f0fa",
+          marginBottom: "0.6rem",
+          letterSpacing: "-0.01em",
+        }}
+      >
+        {step.title}
+      </h3>
+      <p
+        style={{
+          fontFamily: "var(--font-outfit)",
+          fontSize: "0.875rem",
+          color: "#666688",
+          lineHeight: 1.6,
+        }}
+      >
+        {step.desc}
+      </p>
+    </div>
+  );
+}
+
 /* ─── How It Works ────────────────────────────────────── */
 function HowItWorks() {
+  const { ref: headerRef, inView: headerInView } = useInView();
+  const { ref: ctaRef, inView: ctaInView } = useInView();
+
   return (
     <section
       id="how-it-works"
@@ -972,7 +1394,6 @@ function HowItWorks() {
         overflow: "hidden",
       }}
     >
-      {/* Decorative vertical line */}
       <div
         style={{
           position: "absolute",
@@ -989,7 +1410,11 @@ function HowItWorks() {
 
       <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
         {/* Section header */}
-        <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+        <div
+          ref={headerRef}
+          className={headerInView ? "anim-fadeInUp" : "anim-hidden"}
+          style={{ textAlign: "center", marginBottom: "4rem" }}
+        >
           <div
             style={{
               display: "inline-block",
@@ -1039,100 +1464,16 @@ function HowItWorks() {
           }}
         >
           {STEPS.map((step, idx) => (
-            <div
-              key={step.num}
-              style={{
-                position: "relative",
-                textAlign: "center",
-                padding: "2rem 1.5rem",
-              }}
-            >
-              {/* Connector */}
-              {idx < STEPS.length - 1 && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "3.5rem",
-                    right: "-0.75rem",
-                    width: "1.5rem",
-                    height: "1px",
-                    background:
-                      "linear-gradient(90deg, #1c1c38, rgba(28,28,56,0))",
-                    zIndex: -1,
-                  }}
-                />
-              )}
-
-              <div
-                style={{
-                  fontFamily: "var(--font-syne)",
-                  fontSize: "0.7rem",
-                  fontWeight: 700,
-                  color: step.color,
-                  letterSpacing: "0.15em",
-                  textTransform: "uppercase",
-                  marginBottom: "1.25rem",
-                  opacity: 0.7,
-                }}
-              >
-                Step {step.num}
-              </div>
-
-              <div
-                style={{
-                  width: "72px",
-                  height: "72px",
-                  borderRadius: "50%",
-                  background: `radial-gradient(circle at 35% 35%, ${step.color}33, ${step.color}11)`,
-                  border: `2px solid ${step.color}35`,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "2rem",
-                  margin: "0 auto 1.25rem",
-                  boxShadow: `0 0 24px ${step.color}25`,
-                  position: "relative",
-                }}
-              >
-                {step.icon}
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: "-6px",
-                    borderRadius: "50%",
-                    border: `1px solid ${step.color}18`,
-                  }}
-                />
-              </div>
-
-              <h3
-                style={{
-                  fontFamily: "var(--font-syne)",
-                  fontSize: "1.05rem",
-                  fontWeight: 700,
-                  color: "#f0f0fa",
-                  marginBottom: "0.6rem",
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                {step.title}
-              </h3>
-              <p
-                style={{
-                  fontFamily: "var(--font-outfit)",
-                  fontSize: "0.875rem",
-                  color: "#666688",
-                  lineHeight: 1.6,
-                }}
-              >
-                {step.desc}
-              </p>
-            </div>
+            <StepCard key={step.num} step={step} idx={idx} />
           ))}
         </div>
 
         {/* CTA */}
-        <div style={{ textAlign: "center", marginTop: "3rem" }}>
+        <div
+          ref={ctaRef}
+          className={ctaInView ? "anim-fadeInUp" : "anim-hidden"}
+          style={{ textAlign: "center", marginTop: "3rem" }}
+        >
           <a
             href="#"
             className="btn-primary"
@@ -1151,8 +1492,206 @@ function HowItWorks() {
   );
 }
 
+/* ─── Tournament Card (extracted for hooks) ───────────── */
+function TournamentCard({ t, idx, dir }: { t: typeof MOCK_TOURNAMENTS[number]; idx: number; dir: string }) {
+  const { ref, inView } = useInView();
+  return (
+    <div
+      ref={ref}
+      className={`card-glow ${inView ? `anim-${dir}` : "anim-hidden"}`}
+      style={{
+        background: "#0d0d1e",
+        border: "1px solid #1c1c38",
+        borderRadius: "1.25rem",
+        padding: "1.5rem",
+        position: "relative",
+        overflow: "hidden",
+        animationDelay: inView ? `${idx * 0.12}s` : "0s",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: "-20px",
+          right: "-20px",
+          width: "100px",
+          height: "100px",
+          borderRadius: "50%",
+          background:
+            "radial-gradient(circle, rgba(255,45,139,0.08), transparent 70%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: "1.25rem",
+        }}
+      >
+        <div>
+          <div
+            style={{
+              fontFamily: "var(--font-outfit)",
+              fontSize: "0.72rem",
+              color: "#666688",
+              marginBottom: "0.25rem",
+              fontWeight: 500,
+            }}
+          >
+            {t.id}
+          </div>
+          <h3
+            style={{
+              fontFamily: "var(--font-syne)",
+              fontSize: "1.05rem",
+              fontWeight: 700,
+              color: "#f0f0fa",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            {t.name}
+          </h3>
+        </div>
+        <div
+          style={{
+            background: `${t.diffColor}18`,
+            border: `1px solid ${t.diffColor}30`,
+            borderRadius: "0.5rem",
+            padding: "0.25rem 0.6rem",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "var(--font-syne)",
+              fontSize: "0.7rem",
+              fontWeight: 700,
+              color: t.diffColor,
+            }}
+          >
+            {t.difficulty}
+          </span>
+        </div>
+      </div>
+
+      <div
+        style={{
+          background: "rgba(255,45,139,0.06)",
+          border: "1px solid rgba(255,45,139,0.15)",
+          borderRadius: "0.875rem",
+          padding: "1rem",
+          marginBottom: "1.25rem",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "var(--font-outfit)",
+            fontSize: "0.72rem",
+            color: "#ff79c6",
+            fontWeight: 500,
+            marginBottom: "0.2rem",
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+          }}
+        >
+          Prize Pool
+        </div>
+        <div
+          style={{
+            fontFamily: "var(--font-syne)",
+            fontSize: "1.75rem",
+            fontWeight: 800,
+            color: "#ff2d8b",
+            letterSpacing: "-0.02em",
+          }}
+        >
+          {t.prizePool}
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr 1fr",
+          gap: "0.75rem",
+          marginBottom: "1.25rem",
+        }}
+      >
+        {[
+          { label: "Entry Fee", value: t.entryFee },
+          { label: "Players", value: `${t.players}/${t.maxPlayers}` },
+          { label: "Ends In", value: t.endsIn },
+        ].map((s) => (
+          <div key={s.label} style={{ textAlign: "center" }}>
+            <div
+              style={{
+                fontFamily: "var(--font-syne)",
+                fontSize: "0.85rem",
+                fontWeight: 700,
+                color: "#f0f0fa",
+                marginBottom: "0.15rem",
+              }}
+            >
+              {s.value}
+            </div>
+            <div
+              style={{
+                fontFamily: "var(--font-outfit)",
+                fontSize: "0.7rem",
+                color: "#555577",
+              }}
+            >
+              {s.label}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginBottom: "1.25rem" }}>
+        <div
+          style={{
+            height: "4px",
+            background: "#1c1c38",
+            borderRadius: "2px",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              width: `${(t.players / t.maxPlayers) * 100}%`,
+              background: "linear-gradient(90deg, #ff2d8b, #ff79c6)",
+              borderRadius: "2px",
+            }}
+          />
+        </div>
+      </div>
+
+      <button
+        className="btn-primary"
+        style={{
+          width: "100%",
+          justifyContent: "center",
+          padding: "0.65rem",
+          fontSize: "0.875rem",
+          animation: "none",
+        }}
+      >
+        Join Tournament
+      </button>
+    </div>
+  );
+}
+
 /* ─── Tournament Preview ──────────────────────────────── */
 function TournamentPreview() {
+  const { ref: headerRef, inView: headerInView } = useInView();
+  const { ref: bannerRef, inView: bannerInView } = useInView();
+  const cardDirs = ["slideInLeft", "slideInBottom", "slideInRight"];
+
   return (
     <section
       id="tournaments"
@@ -1160,6 +1699,8 @@ function TournamentPreview() {
     >
       {/* Header */}
       <div
+        ref={headerRef}
+        className={headerInView ? "anim-slideInLeft" : "anim-hidden"}
         style={{
           display: "flex",
           alignItems: "flex-end",
@@ -1224,198 +1765,15 @@ function TournamentPreview() {
           gap: "1.25rem",
         }}
       >
-        {MOCK_TOURNAMENTS.map((t) => (
-          <div
-            key={t.id}
-            className="card-glow"
-            style={{
-              background: "#0d0d1e",
-              border: "1px solid #1c1c38",
-              borderRadius: "1.25rem",
-              padding: "1.5rem",
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: "-20px",
-                right: "-20px",
-                width: "100px",
-                height: "100px",
-                borderRadius: "50%",
-                background:
-                  "radial-gradient(circle, rgba(255,45,139,0.08), transparent 70%)",
-                pointerEvents: "none",
-              }}
-            />
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                marginBottom: "1.25rem",
-              }}
-            >
-              <div>
-                <div
-                  style={{
-                    fontFamily: "var(--font-outfit)",
-                    fontSize: "0.72rem",
-                    color: "#666688",
-                    marginBottom: "0.25rem",
-                    fontWeight: 500,
-                  }}
-                >
-                  {t.id}
-                </div>
-                <h3
-                  style={{
-                    fontFamily: "var(--font-syne)",
-                    fontSize: "1.05rem",
-                    fontWeight: 700,
-                    color: "#f0f0fa",
-                    letterSpacing: "-0.01em",
-                  }}
-                >
-                  {t.name}
-                </h3>
-              </div>
-              <div
-                style={{
-                  background: `${t.diffColor}18`,
-                  border: `1px solid ${t.diffColor}30`,
-                  borderRadius: "0.5rem",
-                  padding: "0.25rem 0.6rem",
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: "var(--font-syne)",
-                    fontSize: "0.7rem",
-                    fontWeight: 700,
-                    color: t.diffColor,
-                  }}
-                >
-                  {t.difficulty}
-                </span>
-              </div>
-            </div>
-
-            <div
-              style={{
-                background: "rgba(255,45,139,0.06)",
-                border: "1px solid rgba(255,45,139,0.15)",
-                borderRadius: "0.875rem",
-                padding: "1rem",
-                marginBottom: "1.25rem",
-                textAlign: "center",
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: "var(--font-outfit)",
-                  fontSize: "0.72rem",
-                  color: "#ff79c6",
-                  fontWeight: 500,
-                  marginBottom: "0.2rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                }}
-              >
-                Prize Pool
-              </div>
-              <div
-                style={{
-                  fontFamily: "var(--font-syne)",
-                  fontSize: "1.75rem",
-                  fontWeight: 800,
-                  color: "#ff2d8b",
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                {t.prizePool}
-              </div>
-            </div>
-
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr",
-                gap: "0.75rem",
-                marginBottom: "1.25rem",
-              }}
-            >
-              {[
-                { label: "Entry Fee", value: t.entryFee },
-                { label: "Players", value: `${t.players}/${t.maxPlayers}` },
-                { label: "Ends In", value: t.endsIn },
-              ].map((s) => (
-                <div key={s.label} style={{ textAlign: "center" }}>
-                  <div
-                    style={{
-                      fontFamily: "var(--font-syne)",
-                      fontSize: "0.85rem",
-                      fontWeight: 700,
-                      color: "#f0f0fa",
-                      marginBottom: "0.15rem",
-                    }}
-                  >
-                    {s.value}
-                  </div>
-                  <div
-                    style={{
-                      fontFamily: "var(--font-outfit)",
-                      fontSize: "0.7rem",
-                      color: "#555577",
-                    }}
-                  >
-                    {s.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ marginBottom: "1.25rem" }}>
-              <div
-                style={{
-                  height: "4px",
-                  background: "#1c1c38",
-                  borderRadius: "2px",
-                  overflow: "hidden",
-                }}
-              >
-                <div
-                  style={{
-                    height: "100%",
-                    width: `${(t.players / t.maxPlayers) * 100}%`,
-                    background: "linear-gradient(90deg, #ff2d8b, #ff79c6)",
-                    borderRadius: "2px",
-                  }}
-                />
-              </div>
-            </div>
-
-            <button
-              className="btn-primary"
-              style={{
-                width: "100%",
-                justifyContent: "center",
-                padding: "0.65rem",
-                fontSize: "0.875rem",
-                animation: "none",
-              }}
-            >
-              Join Tournament
-            </button>
-          </div>
+        {MOCK_TOURNAMENTS.map((t, idx) => (
+          <TournamentCard key={t.id} t={t} idx={idx} dir={cardDirs[idx]} />
         ))}
       </div>
 
       {/* Bottom CTA banner */}
       <div
+        ref={bannerRef}
+        className={bannerInView ? "anim-fadeInUp" : "anim-hidden"}
         style={{
           marginTop: "3rem",
           background:
@@ -1485,6 +1843,8 @@ function TournamentPreview() {
 
 /* ─── Footer ──────────────────────────────────────────── */
 function Footer() {
+  const { ref, inView } = useInView();
+
   return (
     <footer
       style={{
@@ -1508,7 +1868,11 @@ function Footer() {
         }}
       />
 
-      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+      <div
+        ref={ref}
+        className={inView ? "anim-fadeInUp" : "anim-hidden"}
+        style={{ maxWidth: "1100px", margin: "0 auto" }}
+      >
         <div
           className="footer-grid"
           style={{
@@ -1518,31 +1882,17 @@ function Footer() {
             marginBottom: "3rem",
           }}
         >
-          {/* Brand */}
+          {/* Brand — with the real diamond logo */}
           <div>
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "0.6rem",
+                gap: "0.75rem",
                 marginBottom: "1rem",
               }}
             >
-              <div
-                style={{
-                  width: "34px",
-                  height: "34px",
-                  borderRadius: "10px",
-                  background: "linear-gradient(135deg, #ff2d8b, #b44dff)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "16px",
-                  boxShadow: "0 0 16px rgba(255,45,139,0.4)",
-                }}
-              >
-                🔮
-              </div>
+              <DiamondLogo size={40} />
               <span
                 style={{
                   fontFamily: "var(--font-syne)",
@@ -1690,8 +2040,11 @@ function Footer() {
 
 /* ─── Page ────────────────────────────────────────────── */
 export default function Home() {
+  const [showPreloader, setShowPreloader] = useState(true);
+
   return (
     <>
+      {showPreloader && <Preloader onDone={() => setShowPreloader(false)} />}
       <Navbar />
       <main>
         <Hero />
