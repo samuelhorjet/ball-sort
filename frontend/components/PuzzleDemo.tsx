@@ -58,15 +58,13 @@ function HandCursor({ x, y, dur, clicking }: {
         top: y - 2,
         width: 28,
         height: 32,
-        transition:
-          dur > 0
-            ? `left ${dur}ms cubic-bezier(.42,0,.22,1), top ${dur}ms cubic-bezier(.42,0,.22,1)`
-            : "none",
+        transitionProperty: "left, top, transform",
+        transitionDuration: dur > 0 ? `${dur}ms` : "0ms",
+        transitionTimingFunction: "cubic-bezier(.42,0,.22,1)",
         zIndex: 20,
         pointerEvents: "none",
         transform: clicking ? "scale(0.88)" : "scale(1)",
         transformOrigin: "top left",
-        transitionProperty: "left, top, transform",
         filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.5))",
       }}
     >
@@ -823,7 +821,21 @@ export default function PuzzleDemo() {
                 width: TW,
                 height: TH,
                 borderRadius: "0 0 20px 20px",
-                border: `2px solid ${
+                borderLeft: `2px solid ${
+                  isSol
+                    ? "rgba(61,217,160,0.5)"
+                    : isHL
+                    ? "rgba(255,45,139,0.55)"
+                    : "#1c1c38"
+                }`,
+                borderRight: `2px solid ${
+                  isSol
+                    ? "rgba(61,217,160,0.5)"
+                    : isHL
+                    ? "rgba(255,45,139,0.55)"
+                    : "#1c1c38"
+                }`,
+                borderBottom: `2px solid ${
                   isSol
                     ? "rgba(61,217,160,0.5)"
                     : isHL
@@ -836,7 +848,8 @@ export default function PuzzleDemo() {
                   : isHL
                   ? "rgba(255,45,139,0.04)"
                   : "rgba(10,10,24,0.7)",
-                transition: "border-color 0.3s, background 0.3s",
+                transitionProperty: "border-color, background",
+                transitionDuration: "0.3s",
                 overflow: "hidden",
               }}
             >

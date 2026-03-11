@@ -200,7 +200,7 @@ export default function HowItWorks() {
             <a
               href="#"
               className="btn-primary"
-              style={{ marginTop: "0.5rem", alignSelf: "flex-start", fontSize: "0.9rem" }}
+              style={{ marginTop: "0.5rem", alignSelf: "center", fontSize: "0.9rem" }}
             >
               Start Playing — It&apos;s Free ↗
             </a>

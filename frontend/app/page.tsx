@@ -635,14 +635,14 @@ function Navbar() {
             key={item.label}
             href={item.href}
             style={{
-              color: "#666688",
+              color: "#8888aa",
               textDecoration: "none",
               fontWeight: 500,
               fontSize: "0.93rem",
               transition: "color 0.2s",
             }}
             onMouseEnter={(e) => (e.currentTarget.style.color = "#f0f0fa")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "#666688")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#8888aa")}
           >
             {item.label}
           </Link>
@@ -875,7 +875,7 @@ function Hero() {
               fontFamily: "var(--font-outfit)",
               fontSize: "clamp(1rem, 2vw, 1.15rem)",
               fontWeight: 400,
-              color: "#9999bb",
+              color: "#aaaabb",
               lineHeight: 1.7,
               maxWidth: "460px",
               marginBottom: "2.5rem",
@@ -889,7 +889,7 @@ function Hero() {
           <div
             style={{
               display: "flex",
-              gap: "1rem",
+              gap: "0.5rem",
               flexWrap: "wrap",
               animation: "fadeInUp 0.7s ease 0.3s both",
             }}
@@ -948,6 +948,7 @@ function Hero() {
           </div>
 
           <div
+            className="stats-grid"
             style={{
               marginTop: "3rem",
               display: "grid",
@@ -986,7 +987,7 @@ function Hero() {
                   style={{
                     fontFamily: "var(--font-outfit)",
                     fontSize: "0.7rem",
-                    color: "#666688",
+                    color: "#8888aa",
                     fontWeight: 500,
                   }}
                 >
@@ -1039,6 +1040,7 @@ function Hero() {
         @media (max-width: 768px) {
           .hero-layout { grid-template-columns: 1fr !important; min-height: auto !important; padding-top: 3rem !important; padding-bottom: 4rem !important; }
           .hero-layout > div:last-child { display: none !important; }
+          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
       `}</style>
     </section>
@@ -1499,7 +1501,7 @@ function TournamentPreview() {
           <h2
             style={{
               fontFamily: "var(--font-syne)",
-              fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
+              fontSize: "clamp(1.35rem, 3.5vw, 2.5rem)",
               fontWeight: 800,
               color: "#f0f0fa",
               letterSpacing: "-0.03em",
@@ -1671,7 +1673,7 @@ function Footer() {
               style={{
                 fontFamily: "var(--font-outfit)",
                 fontSize: "0.875rem",
-                color: "#555577",
+                color: "#777799",
                 lineHeight: 1.65,
                 maxWidth: "260px",
                 marginBottom: "1.5rem",
@@ -1728,7 +1730,7 @@ function Footer() {
                       style={{
                         fontFamily: "var(--font-outfit)",
                         fontSize: "0.875rem",
-                        color: "#555577",
+                        color: "#777799",
                         textDecoration: "none",
                         transition: "color 0.2s",
                         display: "inline-block",
@@ -1737,7 +1739,7 @@ function Footer() {
                         (e.currentTarget.style.color = "#ff79c6")
                       }
                       onMouseLeave={(e) =>
-                        (e.currentTarget.style.color = "#555577")
+                        (e.currentTarget.style.color = "#777799")
                       }
                     >
                       {item.label}
@@ -1765,7 +1767,7 @@ function Footer() {
             style={{
               fontFamily: "var(--font-outfit)",
               fontSize: "0.8rem",
-              color: "#333355",
+              color: "#555577",
             }}
           >
             © 2025 BallSort. All rights reserved.
@@ -1778,12 +1780,12 @@ function Footer() {
                 style={{
                   fontFamily: "var(--font-outfit)",
                   fontSize: "0.8rem",
-                  color: "#333355",
+                  color: "#555577",
                   textDecoration: "none",
                   transition: "color 0.2s",
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.color = "#ff79c6")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "#333355")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#555577")}
               >
                 {item}
               </a>
