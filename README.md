@@ -14,7 +14,7 @@ The protocol separates private gameplay from public settlement:
 ### Links
 
 Frontend Repo  
-https://github.com/samuelhorjet/ball-sort-frontend
+https://github.com/samuelhorjet/ball-sort/tree/main/frontend
 
 Smart Contract Repo  
 https://github.com/samuelhorjet/ball-sort
